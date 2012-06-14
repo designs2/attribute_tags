@@ -43,6 +43,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			'tag_table',
 			'tag_column',
 			'tag_id',
+			'tag_alias',
 		));
 	}
 
@@ -70,6 +71,19 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 		$arrResult['html'] = implode(', ', $arrValue);
 		return $arrResult;
+	}
+	
+	/**
+	 * {@inheritdoc}
+	 */
+	public function parseFilterUrl($arrUrlParams)
+	{
+		$objFilterRule = NULL;
+		if (key_exists($this->getColName(), $arrUrlParams))
+		{
+			$objFilterRule = new MetaModelFilterRuleTags($this, $arrUrlParams[$this->getColName()]);
+		}
+		return $objFilterRule;
 	}
 
 	/////////////////////////////////////////////////////////////////
