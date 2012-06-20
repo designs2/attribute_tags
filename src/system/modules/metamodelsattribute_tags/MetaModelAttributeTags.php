@@ -56,7 +56,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		return $arrFieldDef;
 	}
 
-	public function parseValue($arrRowData, $strOutputFormat = 'html')
+	public function parseValue($arrRowData, $strOutputFormat = 'text')
 	{
 		$arrResult = parent::parseValue($arrRowData, $strOutputFormat);
 		$arrValue = array();
@@ -69,7 +69,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			}
 		}
 
-		$arrResult['html'] = implode(', ', $arrValue);
+		$arrResult['text'] = implode(', ', $arrValue);
 		return $arrResult;
 	}
 	
