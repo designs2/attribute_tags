@@ -77,6 +77,50 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		return $arrFieldDef;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function valueToWidget($varValue)
+	{
+		$strColNameAlias = $this->getAliasCol();
+
+		$arrResult = array();
+		foreach ($varValue as $arrValue)
+		{
+			$arrResult[] = $arrValue[$strColNameAlias];
+		}
+		return $arrResult;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function widgetToValue($varValue)
+	{
+		$arrSearch = array();
+		foreach ($varValue as $strValue)
+		{
+			$arrSearch[] = sprintf('"%s"', mysql_real_escape_string($strValue));
+		}
+		$objDB = Database::getInstance();
+		$objValue = $objDB->prepare(sprintf('SELECT %1$s.* FROM %1$s WHERE %2$s IN (%3$s)',
+			$this->get('tag_table'),
+			$this->getAliasCol(),
+			implode(',', $arrSearch)
+		))
+		->execute();
+		$strColNameId = $this->get('tag_id');
+		$arrResult = array();
+		while ($objValue->next())
+		{
+			$arrResult[$objValue->$strColNameId] = $objValue->row();
+		}
+		return $arrResult;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function parseValue($arrRowData, $strOutputFormat = 'text')
 	{
 		$arrResult = parent::parseValue($arrRowData, $strOutputFormat);
