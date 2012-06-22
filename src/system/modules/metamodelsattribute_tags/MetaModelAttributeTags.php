@@ -284,7 +284,67 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 	public function setDataFor($arrValues)
 	{
-		// TODO: store to database.
+		$objDB = Database::getInstance();
+		$arrItemIds = array_map('intval', array_keys($arrValues));
+		sort($arrItemIds);
+		// load all existing tags for all items to be updated, keep the ordering to item Id
+		// so we can benefit from the batch deletion and insert algorithm.
+		$objExistingTagIds = $objDB->prepare(sprintf('
+		SELECT * FROM tl_metamodel_tag_relation
+		WHERE
+		att_id=?
+		AND item_id IN (%1$s)
+		ORDER BY item_id ASC
+		', implode(',', $arrItemIds)))
+		->execute($this->get('id'));
+
+		// now loop over all items and update the values for them.
+		// NOTE: we can not loop over the original array, as the item ids are not neccessarily
+		// sorted ascending by item id.
+		$arrSQLInsertValues = array();
+		foreach ($arrItemIds as $intItemId)
+		{
+			$arrTags = $arrValues[$intItemId];
+			$arrTagIds = array_map('intval', array_keys($arrTags));
+			$arrThisExisting = array();
+
+			// determine existing tags for this item.
+			if (($objExistingTagIds->item_id == $intItemId))
+			{
+				$arrThisExisting[] = $objExistingTagIds->value_id;
+			}
+			while ($objExistingTagIds->next() && ($objExistingTagIds->item_id == $intItemId))
+			{
+				$arrThisExisting[] = $objExistingTagIds->value_id;
+			}
+
+			// first pass, delete all not mentioned anymore.
+			$arrValuesToRemove = array_diff($arrThisExisting, $arrTagIds);
+			if ($arrValuesToRemove)
+			{
+				$objDB->prepare(sprintf('
+				DELETE FROM tl_metamodel_tag_relation
+				WHERE
+				att_id=?
+				AND item_id=?
+				AND value_id IN (%s)
+				', implode(',', $arrValuesToRemove)))
+				->execute($this->get('id'), $intItemId);
+			}
+			// second pass, add all new values in a row.
+			$arrValuesToAdd = array_diff($arrTagIds, $arrThisExisting);
+			if ($arrValuesToAdd)
+			{
+				foreach ($arrValuesToAdd as $intValueId)
+				{
+					$arrSQLInsertValues[] = sprintf('(%s,%s,%s)', $this->get('id'), $intItemId, $intValueId);
+				}
+			}
+		}
+		if ($arrSQLInsertValues)
+		{
+			$objDB->execute('INSERT INTO tl_metamodel_tag_relation (att_id, item_id, value_id) VALUES ' . implode(',', $arrSQLInsertValues));
+		}
 	}
 }
 
