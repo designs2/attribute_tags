@@ -124,17 +124,57 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	public function parseValue($arrRowData, $strOutputFormat = 'text')
 	{
 		$arrResult = parent::parseValue($arrRowData, $strOutputFormat);
-		$arrValue = array();
+		$arrTextFormat = array();
+		$arrDesiredFormat = array();
 
 		if ($arrRowData[$this->getColName()])
 		{
+			$strColNameAlias = $this->get('tag_alias');
+			$i=0;
+			$last=count($arrRowData[$this->getColName()])-1;
 			foreach ($arrRowData[$this->getColName()] as $arrTag)
 			{
-				$arrValue[] = $arrTag[$this->get('tag_column')];
+				switch($strOutputFormat)
+				{
+					// html rendering
+					case 'xhtml':
+					case 'html5':
+						$arrClass = array();
+						if($i==0)
+						{
+							$arrClass[] = 'first';
+						}
+						if($i==$last)
+						{
+							$arrClass[] = 'last';
+						}
+						$arrClass[] = ((($i++ % 2)==0) ? 'even' : 'odd');
+
+						if ($strColNameAlias && $arrTag[$strColNameAlias] && !is_numeric($arrTag[$strColNameAlias]))
+						{
+							$arrClass[] = standardize($arrTag[$strColNameAlias]);
+						}
+
+						$arrDesiredFormat[] = sprintf('<li class="%s">%s</li>',
+							implode(' ', $arrClass),
+							$arrTag[$this->get('tag_column')]
+						);
+					break;
+
+					default:
+				}
+				// default "simple" plaintext rendering is mandatory.
+				$arrTextFormat[] = $arrTag[$this->get('tag_column')];
 			}
 		}
 
-		$arrResult['text'] = implode(', ', $arrValue);
+		switch($strOutputFormat)
+		{
+			case 'html5':
+				$arrResult['html5'] = '<ul>' . implode('', $arrDesiredFormat) . '</ul>';
+		}
+		// text is mandatory.
+		$arrResult['text'] = implode(', ', $arrTextFormat);
 		return $arrResult;
 	}
 
