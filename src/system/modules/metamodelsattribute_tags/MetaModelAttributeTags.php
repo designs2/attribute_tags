@@ -28,15 +28,31 @@ if (!defined('TL_ROOT'))
 class MetaModelAttributeTags extends MetaModelAttributeComplex
 {
 
-	public function getOptions($blnUsedOnly=false)
+	/**
+	 * Determine the column to be used for alias.
+	 * This is either the configured alias column or the id, if
+	 * an alias column is absent.
+	 * 
+	 * @return string the name of the column.
+	 */
+	public function getAliasCol()
 	{
-		return array();
+		$strColNameAlias = $this->get('tag_alias');
+		if (!$strColNameAlias)
+		{
+			$strColNameAlias = $this->get('tag_id');
+		}
+		return $strColNameAlias;
 	}
+
 
 	/////////////////////////////////////////////////////////////////
 	// interface IMetaModelAttribute
 	/////////////////////////////////////////////////////////////////
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getAttributeSettingNames()
 	{
 		return array_merge(parent::getAttributeSettingNames(), array(
@@ -47,12 +63,17 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		));
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getFieldDefinition()
 	{
 		// TODO: add tree support here.
 		$arrFieldDef=parent::getFieldDefinition();
-		$arrFieldDef['inputType'] = 'select';
-		$arrFieldDef['options'] = $this->getOptions();
+		$arrFieldDef['inputType'] = 'checkboxWizard';
+		$arrFieldDef['options'] = $this->getFilterOptions();
+		$arrFieldDef['eval']['includeBlankOption'] = true;
+		$arrFieldDef['eval']['multiple'] = true;
 		return $arrFieldDef;
 	}
 
@@ -72,7 +93,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		$arrResult['text'] = implode(', ', $arrValue);
 		return $arrResult;
 	}
-	
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -86,19 +107,65 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		return $objFilterRule;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 * 
+	 * Fetch filter options from foreign table.
+	 * 
+	 */
+	public function getFilterOptions($arrIds = array())
+	{
+		$strTableName = $this->get('tag_table');
+		$strColNameId = $this->get('tag_id');
+
+		$arrReturn = array();
+
+		if ($strTableName && $strColNameId)
+		{
+			$strColNameValue = $this->get('tag_column');
+			$strColNameAlias = $this->getAliasCol();
+			$objDB = Database::getInstance();
+			if ($arrIds)
+			{
+				$objValue = $objDB->prepare(sprintf('
+					SELECT %1$s.*
+					FROM %1$s
+					LEFT JOIN tl_metamodel_tag_relation ON (
+						(tl_metamodel_tag_relation.att_id=?)
+						AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
+					)
+					WHERE tl_metamodel_tag_relation.item_id IN (%3$s) GROUP BY %1$s.%2$s',
+					$strTableName, // 1
+					$strColNameId, // 2
+					implode(',', $arrIds) // 3
+				))
+				->execute($this->get('id'));
+			} else {
+				$objValue = $objDB->prepare(sprintf('SELECT %1$s.* FROM %1$s', $strTableName))
+				->execute();
+			}
+
+			while ($objValue->next())
+			{
+				$arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
+			}
+		}
+		return $arrReturn;
+	}
+
 	/////////////////////////////////////////////////////////////////
 	// interface IMetaModelAttributeComplex
 	/////////////////////////////////////////////////////////////////
 
 	public function getDataFor($arrIds)
 	{
-		$objDB = Database::getInstance();
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
 		$arrReturn = array();
 
 		if ($strTableName && $strColNameId)
 		{
+			$objDB = Database::getInstance();
 			$strMetaModelTableName = $this->getMetaModel()->getTableName();
 			$strMetaModelTableNameId = $strMetaModelTableName.'_id';
 
@@ -123,7 +190,9 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				{
 					$arrReturn[$objValue->$strMetaModelTableNameId] = array();
 				}
-				$arrReturn[$objValue->$strMetaModelTableNameId][] = $objValue->row();
+				$arrData = $objValue->row();
+				unset($arrData[$strMetaModelTableNameId]);
+				$arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
 			}
 		}
 		return $arrReturn;
