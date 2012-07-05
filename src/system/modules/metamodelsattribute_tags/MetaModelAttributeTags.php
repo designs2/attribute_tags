@@ -85,9 +85,12 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		$strColNameAlias = $this->getAliasCol();
 
 		$arrResult = array();
-		foreach ($varValue as $arrValue)
+		if ($varValue)
 		{
-			$arrResult[] = $arrValue[$strColNameAlias];
+			foreach ($varValue as $arrValue)
+			{
+				$arrResult[] = $arrValue[$strColNameAlias];
+			}
 		}
 		return $arrResult;
 	}
@@ -154,7 +157,6 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						{
 							$arrClass[] = standardize($arrTag[$strColNameAlias]);
 						}
-
 						$arrDesiredFormat[] = sprintf('<li class="%s">%s</li>',
 							implode(' ', $arrClass),
 							$arrTag[$this->get('tag_column')]
