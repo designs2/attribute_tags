@@ -29,6 +29,16 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 {
 
 	/**
+	 * when rendered via a template, this returns the values to be stored in the template.
+	 */
+	protected function prepareTemplate(MetaModelTemplate $objTemplate, $arrRowData, $objSettings = null)
+	{
+		parent::prepareTemplate($objTemplate, $arrRowData, $objSettings);
+		$objTemplate->alias = $this->get('tag_alias');
+		$objTemplate->value = $this->get('tag_column');
+	}
+
+	/**
 	 * Determine the column to be used for alias.
 	 * This is either the configured alias column or the id, if
 	 * an alias column is absent.
@@ -44,7 +54,6 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		}
 		return $strColNameAlias;
 	}
-
 
 	/////////////////////////////////////////////////////////////////
 	// interface IMetaModelAttribute
@@ -118,65 +127,6 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		{
 			$arrResult[$objValue->$strColNameId] = $objValue->row();
 		}
-		return $arrResult;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function parseValue($arrRowData, $strOutputFormat = 'text')
-	{
-		$arrResult = parent::parseValue($arrRowData, $strOutputFormat);
-		$arrTextFormat = array();
-		$arrDesiredFormat = array();
-
-		if ($arrRowData[$this->getColName()])
-		{
-			$strColNameAlias = $this->get('tag_alias');
-			$i=0;
-			$last=count($arrRowData[$this->getColName()])-1;
-			foreach ($arrRowData[$this->getColName()] as $arrTag)
-			{
-				switch($strOutputFormat)
-				{
-					// html rendering
-					case 'xhtml':
-					case 'html5':
-						$arrClass = array();
-						if($i==0)
-						{
-							$arrClass[] = 'first';
-						}
-						if($i==$last)
-						{
-							$arrClass[] = 'last';
-						}
-						$arrClass[] = ((($i++ % 2)==0) ? 'even' : 'odd');
-
-						if ($strColNameAlias && $arrTag[$strColNameAlias] && !is_numeric($arrTag[$strColNameAlias]))
-						{
-							$arrClass[] = standardize($arrTag[$strColNameAlias]);
-						}
-						$arrDesiredFormat[] = sprintf('<li class="%s">%s</li>',
-							implode(' ', $arrClass),
-							$arrTag[$this->get('tag_column')]
-						);
-					break;
-
-					default:
-				}
-				// default "simple" plaintext rendering is mandatory.
-				$arrTextFormat[] = $arrTag[$this->get('tag_column')];
-			}
-		}
-
-		switch($strOutputFormat)
-		{
-			case 'html5':
-				$arrResult['html5'] = '<ul>' . implode('', $arrDesiredFormat) . '</ul>';
-		}
-		// text is mandatory.
-		$arrResult['text'] = implode(', ', $arrTextFormat);
 		return $arrResult;
 	}
 
