@@ -298,6 +298,11 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			$objDB->execute('INSERT INTO tl_metamodel_tag_relation (att_id, item_id, value_id) VALUES ' . implode(',', $arrSQLInsertValues));
 		}
 	}
+    
+    public function unsetDataFor($arrIds)
+    {
+        // TODO: unset Data
+    } 
 }
 
 ?>
