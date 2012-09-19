@@ -20,7 +20,7 @@ if (!defined('TL_ROOT'))
 
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
- * 
+ *
  * @package	   MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
@@ -42,7 +42,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	 * Determine the column to be used for alias.
 	 * This is either the configured alias column or the id, if
 	 * an alias column is absent.
-	 * 
+	 *
 	 * @return string the name of the column.
 	 */
 	public function getAliasCol()
@@ -107,7 +107,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	/**
 	 * {@inheritdoc}
 	 */
-	public function widgetToValue($varValue)
+	public function widgetToValue($varValue, $intId)
 	{
 		$arrSearch = array();
 		foreach ($varValue as $strValue)
@@ -145,9 +145,9 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 	/**
 	 * {@inheritdoc}
-	 * 
+	 *
 	 * Fetch filter options from foreign table.
-	 * 
+	 *
 	 */
 	public function getFilterOptions($arrIds = array())
 	{
@@ -298,11 +298,11 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			$objDB->execute('INSERT INTO tl_metamodel_tag_relation (att_id, item_id, value_id) VALUES ' . implode(',', $arrSQLInsertValues));
 		}
 	}
-    
+
     public function unsetDataFor($arrIds)
     {
         // TODO: unset Data
-    } 
+    }
 }
 
 ?>
