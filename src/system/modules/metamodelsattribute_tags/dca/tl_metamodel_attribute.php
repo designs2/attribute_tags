@@ -24,7 +24,7 @@ if (!defined('TL_ROOT'))
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tags extends _simpleattribute_'] = array
 (
-	'+title' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias')
+	'+display' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias')
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_table'] = array
@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_table'] = array
 		'doNotSaveEmpty' => true,
 		'alwaysSave' => true,
 		'submitOnChange'=> true,
-        'tl_class'=>'w50',
+		'tl_class' => 'w50',
 		'chosen' => 'true'
 	),
 );
@@ -56,7 +56,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_column'] = array
 		'doNotSaveEmpty' => true,
 		'alwaysSave' => true,
 		'submitOnChange'=> true,
-		'tl_class'=>'w50',
+		'tl_class' => 'w50',
 		'chosen' => 'true'
 	),
 );
@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_id'] = array
 		'doNotSaveEmpty' => true,
 		'alwaysSave' => true,
 		'submitOnChange'=> true,
-		'tl_class'=>'w50',
+		'tl_class' => 'w50',
 		'chosen' => 'true'
 	),
 );
@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_alias'] = array
 		'doNotSaveEmpty' => true,
 		'alwaysSave' => true,
 		'submitOnChange'=> true,
-		'tl_class'=>'w50',
+		'tl_class' => 'w50',
 		'chosen' => 'true'
 	),
 );
