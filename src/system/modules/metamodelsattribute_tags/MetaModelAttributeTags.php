@@ -109,6 +109,8 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	 */
 	public function widgetToValue($varValue, $intId)
 	{
+		if (!is_array($varValue)) return array();
+		
 		$arrSearch = array();
 		foreach ($varValue as $strValue)
 		{
@@ -127,6 +129,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		{
 			$arrResult[$objValue->$strColNameId] = $objValue->row();
 		}
+
 		return $arrResult;
 	}
 
