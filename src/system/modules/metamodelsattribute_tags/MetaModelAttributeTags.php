@@ -69,6 +69,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			'tag_column',
 			'tag_id',
 			'tag_alias',
+			'tag_sorting',
 		));
 	}
 
@@ -79,7 +80,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	{
 		// TODO: add tree support here.
 		$arrFieldDef=parent::getFieldDefinition();
-		$arrFieldDef['inputType'] = 'checkboxWizard';
+		$arrFieldDef['inputType'] = 'checkbox';
 		$arrFieldDef['options'] = $this->getFilterOptions();
 		$arrFieldDef['eval']['includeBlankOption'] = true;
 		$arrFieldDef['eval']['multiple'] = true;
@@ -125,6 +126,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		->execute();
 		$strColNameId = $this->get('tag_id');
 		$arrResult = array();
+
 		while ($objValue->next())
 		{
 			$arrResult[$objValue->$strColNameId] = $objValue->row();
@@ -156,10 +158,11 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	{
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
-
+		$strSortColumn = $this->get('tag_sorting');
+		
 		$arrReturn = array();
 
-		if ($strTableName && $strColNameId)
+		if ($strTableName && $strColNameId && $strSortColumn)
 		{
 			$strColNameValue = $this->get('tag_column');
 			$strColNameAlias = $this->getAliasCol();
@@ -173,14 +176,16 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						(tl_metamodel_tag_relation.att_id=?)
 						AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
 					)
-					WHERE tl_metamodel_tag_relation.item_id IN (%3$s) GROUP BY %1$s.%2$s',
+					WHERE tl_metamodel_tag_relation.item_id IN (%3$s) GROUP BY %1$s.%2$s ORDER BY %4$s',
 					$strTableName, // 1
 					$strColNameId, // 2
-					implode(',', $arrIds) // 3
+					implode(',', $arrIds), // 3
+					$strSortColumn // 4
 				))
 				->execute($this->get('id'));
+
 			} else {
-				$objValue = $objDB->prepare(sprintf('SELECT %1$s.* FROM %1$s', $strTableName))
+				$objValue = $objDB->prepare(sprintf('SELECT %1$s.* FROM %1$s ORDER BY %2$s', $strTableName, $strSortColumn))
 				->execute();
 			}
 

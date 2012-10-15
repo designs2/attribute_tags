@@ -24,7 +24,7 @@ if (!defined('TL_ROOT'))
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tags extends _simpleattribute_'] = array
 (
-	'+display' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias')
+	'+display' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias', 'tag_sorting')
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_table'] = array
@@ -93,6 +93,23 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_alias'] = array
 		'tl_class' => 'w50',
 		'chosen' => 'true'
 	),
+);
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_sorting'] = array
+(
+    'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting'],
+    'exclude'               => true,
+    'inputType'             => 'select',
+    'options_callback'      => array('TableMetaModelsAttributeTags', 'getColumnNames'),
+    'eval'                  => array
+    (
+        'includeBlankOption' => true,
+        'doNotSaveEmpty' => true,
+        'alwaysSave' => true,
+        'submitOnChange'=> true,
+        'tl_class' => 'w50',
+        'chosen' => 'true'
+    ),
 );
 
 ?>

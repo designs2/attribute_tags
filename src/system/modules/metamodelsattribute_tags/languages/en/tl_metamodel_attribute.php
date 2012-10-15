@@ -31,5 +31,6 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table']		= array('Database ta
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column']		= array('Table column', 'Please select the column.');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']			= array('Tag ID', 'Please select a entry for the tag id.');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']		= array('Tag alias', 'Please select a entry for the tag alias.');
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting']    = array('Tag sorting', 'Please select a entry for the tag sorting.');
 
 ?>
