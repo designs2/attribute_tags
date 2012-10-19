@@ -137,19 +137,6 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 	/**
 	 * {@inheritdoc}
-	 */
-	public function parseFilterUrl($arrUrlParams)
-	{
-		$objFilterRule = NULL;
-		if (key_exists($this->getColName(), $arrUrlParams))
-		{
-			$objFilterRule = new MetaModelFilterRuleTags($this, $arrUrlParams[$this->getColName()]);
-		}
-		return $objFilterRule;
-	}
-
-	/**
-	 * {@inheritdoc}
 	 *
 	 * Fetch filter options from foreign table.
 	 *
@@ -202,8 +189,8 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	 */
 	public function searchFor($strPattern)
 	{
-		// FIXME: unimplemented
-		throw new Exception('MetaModelAttributeTags::searchFor() is not yet implemented, please do it or find someone who can!', 1);
+		$objFilterRule = new MetaModelFilterRuleTags($this, $strPattern);
+		return $objFilterRule->getMatchingIds();
 	}
 
 	/////////////////////////////////////////////////////////////////
