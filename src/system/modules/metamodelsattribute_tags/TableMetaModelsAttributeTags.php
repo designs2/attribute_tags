@@ -20,13 +20,32 @@ if (!defined('TL_ROOT'))
 
 /**
  * Supplementary class for handling DCA information for select attributes.
- * 
+ *
  * @package	   MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
 class TableMetaModelsAttributeTags extends TableMetaModelAttribute
 {
+	/**
+	 * @var TableMetaModelRenderSetting
+	 */
+	protected static $objInstance = null;
+
+	/**
+	 * Get the static instance.
+	 *
+	 * @static
+	 * @return MetaPalettes
+	 */
+	public static function getInstance()
+	{
+		if (self::$objInstance == null) {
+			self::$objInstance = new TableMetaModelsAttributeTags();
+		}
+		return self::$objInstance;
+	}
+
 	public function getTableNames()
 	{
 		$objDB = Database::getInstance();
