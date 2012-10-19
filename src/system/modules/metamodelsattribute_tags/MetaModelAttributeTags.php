@@ -111,7 +111,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	public function widgetToValue($varValue, $intId)
 	{
 		if (!is_array($varValue)) return array();
-		
+
 		$arrSearch = array();
 		foreach ($varValue as $strValue)
 		{
@@ -159,7 +159,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
 		$strSortColumn = $this->get('tag_sorting');
-		
+
 		$arrReturn = array();
 
 		if ($strTableName && $strColNameId && $strSortColumn)
@@ -195,6 +195,15 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			}
 		}
 		return $arrReturn;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function searchFor($strPattern)
+	{
+		// FIXME: unimplemented
+		throw new Exception('MetaModelAttributeTags::searchFor() is not yet implemented, please do it or find someone who can!', 1);
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -307,10 +316,11 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		}
 	}
 
-    public function unsetDataFor($arrIds)
-    {
-        // TODO: unset Data
-    }
+	public function unsetDataFor($arrIds)
+	{
+		// FIXME: unimplemented
+		throw new Exception('MetaModelAttributeTags::unsetDataFor() is not yet implemented, please do it or find someone who can!', 1);
+	}
 }
 
 ?>
