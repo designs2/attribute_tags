@@ -305,8 +305,19 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 	public function unsetDataFor($arrIds)
 	{
-		// FIXME: unimplemented
-		throw new Exception('MetaModelAttributeTags::unsetDataFor() is not yet implemented, please do it or find someone who can!', 1);
+		if ($arrIds)
+		{
+			if (!is_array($arrIds))
+				throw new Exception('MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.', 1);
+			$objDB = Database::getInstance();
+			$objDB->prepare(sprintf('
+				DELETE FROM tl_metamodel_tag_relation
+				WHERE
+				att_id=?
+				AND item_id IN (%s)', 
+				implode(',', $arrIds)))->execute($this->get('id'));
+		}
+		
 	}
 }
 
