@@ -30,7 +30,8 @@ class MetaModelFilterRuleTags extends MetaModelFilterRule
 
 	public function __construct(MetaModelAttributeTags $objAttribute, $strValue)
 	{
-		parent::__construct($objAttribute);
+		parent::__construct();
+		$this->objAttribute = $objAttribute;
 		$this->value = $strValue;
 	}
 
@@ -40,7 +41,7 @@ class MetaModelFilterRuleTags extends MetaModelFilterRule
 		$strColNameId = $this->objAttribute->get('tag_id');
 		$strColNameAlias = $this->objAttribute->get('tag_alias');
 		
-		$arrValues = explode(',', $this->value);
+		$arrValues = is_array($this->value) ? $this->value : explode(',', $this->value);
 
 		$objDB = Database::getInstance();
 
