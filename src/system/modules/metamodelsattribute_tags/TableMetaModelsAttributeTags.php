@@ -56,13 +56,10 @@ class TableMetaModelsAttributeTags extends TableMetaModelAttribute
 	{
 		$arrFields = array();
 
-		$objTable = $this->Database->prepare('SELECT tag_table FROM tl_metamodel_attribute WHERE id=?')
-				->limit(1)
-				->execute($objDC->id);
-		if (($objTable->numRows > 0)
-		    && $this->Database->tableExists($objTable->tag_table))
+		if (($objDC->getCurrentModel())
+		    && $this->Database->tableExists($objDC->getCurrentModel()->getProperty('tag_table')))
 		{
-			foreach ($this->Database->listFields($objTable->tag_table) as $arrInfo)
+			foreach ($this->Database->listFields($objDC->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
 			{
 				if ($arrInfo['type'] != 'index')
 				{
@@ -78,13 +75,10 @@ class TableMetaModelsAttributeTags extends TableMetaModelAttribute
 	{
 		$arrFields = array();
 
-		$objTable = $this->Database->prepare('SELECT tag_table FROM tl_metamodel_attribute WHERE id=?')
-				->limit(1)
-				->execute($objDC->id);
-		if (($objTable->numRows > 0)
-		    && $this->Database->tableExists($objTable->tag_table))
+		if (($objDC->getCurrentModel())
+		    && $this->Database->tableExists($objDC->getCurrentModel()->getProperty('tag_table')))
 		{
-			foreach ($this->Database->listFields($objTable->tag_table) as $arrInfo)
+			foreach ($this->Database->listFields($objDC->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
 			{
 				if ($arrInfo['type'] != 'index' && $arrInfo['type'] == 'int')
 				{
