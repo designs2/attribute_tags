@@ -76,10 +76,10 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getFieldDefinition()
+	public function getFieldDefinition($arrOverrides = array())
 	{
 		// TODO: add tree support here.
-		$arrFieldDef=parent::getFieldDefinition();
+		$arrFieldDef=parent::getFieldDefinition($arrOverrides);
 		$arrFieldDef['inputType'] = 'checkbox';
 		$arrFieldDef['options'] = $this->getFilterOptions();
 		$arrFieldDef['eval']['includeBlankOption'] = true;
@@ -314,10 +314,10 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				DELETE FROM tl_metamodel_tag_relation
 				WHERE
 				att_id=?
-				AND item_id IN (%s)', 
+				AND item_id IN (%s)',
 				implode(',', $arrIds)))->execute($this->get('id'));
 		}
-		
+
 	}
 }
 
