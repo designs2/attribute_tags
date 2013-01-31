@@ -141,7 +141,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	 * Fetch filter options from foreign table.
 	 *
 	 */
-	public function getFilterOptions($arrIds = array())
+	public function getFilterOptions($arrIds, $usedOnly)
 	{
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
