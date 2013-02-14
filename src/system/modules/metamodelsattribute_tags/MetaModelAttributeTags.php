@@ -131,7 +131,6 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		{
 			$arrResult[$objValue->$strColNameId] = $objValue->row();
 		}
-
 		return $arrResult;
 	}
 
@@ -261,7 +260,12 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		foreach ($arrItemIds as $intItemId)
 		{
 			$arrTags = $arrValues[$intItemId];
-			$arrTagIds = array_map('intval', array_keys($arrTags));
+			if ($arrTags === NULL)
+			{
+				$arrTagIds = array();
+			} else {
+				$arrTagIds = array_map('intval', array_keys($arrTags));
+			}
 			$arrThisExisting = array();
 
 			// determine existing tags for this item.
