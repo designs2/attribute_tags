@@ -70,6 +70,9 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			'tag_id',
 			'tag_alias',
 			'tag_sorting',
+			'mandatory',
+			'filterable',
+			'searchable',
 		));
 	}
 

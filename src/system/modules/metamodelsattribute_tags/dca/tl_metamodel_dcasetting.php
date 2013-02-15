@@ -4,16 +4,14 @@ $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id'
 array
 (
 	'presentation' => array(
-        'tl_class',    
-    ),
-    'functions'  => array(
-        'mandatory'
-    ),
-	'overview' => array(		
+		'tl_class',
+	),
+	'functions'  => array(
+		'mandatory'
+	),
+	'overview' => array(
 		'filterable',
 		'searchable',
-		'sortable',
-		'flag'
 	)
 );
 
