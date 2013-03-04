@@ -84,7 +84,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		// TODO: add tree support here.
 		$arrFieldDef=parent::getFieldDefinition($arrOverrides);
 		$arrFieldDef['inputType'] = 'checkbox';
-		$arrFieldDef['options'] = $this->getFilterOptions(NULL, true);
+		$arrFieldDef['options'] = $this->getFilterOptions(NULL, false);
 		$arrFieldDef['eval']['includeBlankOption'] = true;
 		$arrFieldDef['eval']['multiple'] = true;
 		return $arrFieldDef;
