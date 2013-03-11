@@ -160,36 +160,71 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			$strColNameValue = $this->get('tag_column');
 			$strColNameAlias = $this->getAliasCol();
 			$objDB = Database::getInstance();
+
 			if ($arrIds)
 			{
-				$objValue = $objDB->prepare(sprintf('
-					SELECT %1$s.*
-					FROM %1$s
-					LEFT JOIN tl_metamodel_tag_relation ON (
-						(tl_metamodel_tag_relation.att_id=?)
-						AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
-					)
-					WHERE (tl_metamodel_tag_relation.item_id IN (%3$s)%5$s)
-					GROUP BY %1$s.%2$s ORDER BY %4$s',
+				if($usedOnly)
+				{
+					$strSQL = '
+						SELECT %1$s.*
+						FROM %1$s
+						LEFT JOIN tl_metamodel_tag_relation ON (
+							(tl_metamodel_tag_relation.att_id=?)
+							AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
+						)
+						WHERE (tl_metamodel_tag_relation.item_id IN (%3$s)%5$s)
+						GROUP BY %1$s.%2$s
+						ORDER BY %4$s
+					';
+				} else {
+					$strSQL = '
+						SELECT %1$s.*
+						FROM %1$s
+						WHERE %1$s.%2$s IN (%3$s)%5$s
+						GROUP BY %1$s.%2$s
+						ORDER BY %4$s';
+				}
+
+				$objValue = $objDB->prepare(sprintf($strSQL, // Source
 					$strTableName, // 1
 					$strColNameId, // 2
 					implode(',', $arrIds), // 3
 					$strSortColumn, // 4
 					($strColNameWhere ? ' AND ('.$strColNameWhere.')' : '') //5
-				))
-				->execute($this->get('id'));
+				))->execute($this->get('id'));
 
 			} else {
-				$objValue = $objDB->prepare(sprintf('
-					SELECT %1$s.*
-					FROM %1$s
-					%3$s
-					ORDER BY %2$s',
-					$strTableName, //1
-					$strSortColumn, //2
-					($strColNameWhere ? ' WHERE ('.$strColNameWhere.')' : '') //3
-				))
-				->execute();
+				if($usedOnly)
+				{
+					$strSQL = '
+						SELECT %1$s.*
+						FROM %1$s
+						INNER JOIN tl_metamodel_tag_relation as rel
+						ON (
+							(rel.att_id="%4$s") AND (rel.value_id=%1$s.%3$s)
+						)
+						WHERE rel.att_id=%4$s'
+						. ($strColNameWhere ? ' AND %5$s' : '') . '
+						GROUP BY %1$s.%3$s
+						ORDER BY %2$s';
+				}
+				else
+				{
+					$strSQL = '
+						SELECT %1$s.*
+						FROM %1$s'
+						. ($strColNameWhere ? ' WHERE %5$s' : '') . '
+						GROUP BY %1$s.%3$s
+						ORDER BY %3$s';
+				}
+
+				$objValue = $objDB->prepare(sprintf($strSQL, // Source
+					$strTableName, // 1
+					$strSortColumn, // 2
+					$strColNameId, // 3
+					$this->get('id'), // 4
+					$strColNameWhere // 5
+				))->execute();
 			}
 
 			while ($objValue->next())
