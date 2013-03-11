@@ -113,9 +113,11 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		if (!is_array($varValue)) return array();
 
 		$arrSearch = array();
+		$arrParams = array();
 		foreach ($varValue as $strValue)
 		{
-			$arrSearch[] = sprintf('"%s"', mysql_real_escape_string($strValue));
+			$arrSearch[] = '?';
+			$arrParams[] = $strValue;
 		}
 		$objDB = Database::getInstance();
 		$objValue = $objDB->prepare(sprintf('SELECT %1$s.* FROM %1$s WHERE %2$s IN (%3$s)',
@@ -123,7 +125,8 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			$this->getAliasCol(),
 			implode(',', $arrSearch)
 		))
-		->execute();
+		->execute($arrParams);
+
 		$strColNameId = $this->get('tag_id');
 		$arrResult = array();
 
