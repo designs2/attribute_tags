@@ -10,6 +10,7 @@
  * @package    MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christian de la Haye <service@delahaye.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
@@ -29,3 +30,4 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column']          = array('Sp
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']              = array('Tag ID', 'Bitte einen Eintrag für die Tag-ID auswählen.');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']           = array('Tag-Alias', 'Bitte einen Eintrag für den Tag-Alias auswählen');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting']         = array('Tag-Sortierung', 'Bitte einen Eintrag für die Tag-Sortierung auswählen.');
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where']           = array('SQL-Bedingung', 'Mit der Bedingung kann die Liste der Auswahlpunkte eingeschränkt werden.');

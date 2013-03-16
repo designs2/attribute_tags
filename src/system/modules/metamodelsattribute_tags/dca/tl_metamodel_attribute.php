@@ -10,6 +10,7 @@
  * @package    MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christian de la Haye <service@delahaye.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
@@ -21,7 +22,7 @@
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tags extends _simpleattribute_'] = array
 (
-	'+display' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias', 'tag_sorting')
+	'+display' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias', 'tag_sorting', 'tag_where')
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_table'] = array
@@ -107,4 +108,16 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_sorting'] = array
         'tl_class' => 'w50',
         'chosen' => 'true'
     ),
+);
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_where'] = array
+(
+	'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where'],
+	'exclude'               => true,
+	'inputType'             => 'textarea',
+	'eval'                  => array
+	(
+		'tl_class'=>'clr',
+		'style'=>'height: 4em;',
+	)
 );

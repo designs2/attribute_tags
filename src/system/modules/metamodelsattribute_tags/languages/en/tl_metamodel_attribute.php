@@ -10,6 +10,7 @@
  * @package    MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christian de la Haye <service@delahaye.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
@@ -29,3 +30,4 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column']          = array('Ta
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']              = array('Tag ID', 'Please select a entry for the tag id.');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']           = array('Tag alias', 'Please select a entry for the tag alias.');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting']         = array('Tag sorting', 'Please select a entry for the tag sorting.');
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where']           = array('SQL', 'The list of options can be limited by using SQL.');

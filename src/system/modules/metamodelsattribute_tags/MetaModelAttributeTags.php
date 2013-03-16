@@ -10,6 +10,7 @@
  * @package    MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christian de la Haye <service@delahaye.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
@@ -21,6 +22,7 @@
  * @package    MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christian de la Haye <service@delahaye.de>
  */
 class MetaModelAttributeTags extends MetaModelAttributeComplex
 {
@@ -66,6 +68,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			'tag_column',
 			'tag_id',
 			'tag_alias',
+			'tag_where',
 			'tag_sorting',
 			'mandatory',
 			'filterable',
@@ -148,6 +151,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
 		$strSortColumn = $this->get('tag_sorting');
+		$strColNameWhere = ($this->get('tag_where') ? html_entity_decode($this->get('tag_where')) : false);
 
 		$arrReturn = array();
 
@@ -165,16 +169,26 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						(tl_metamodel_tag_relation.att_id=?)
 						AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
 					)
-					WHERE tl_metamodel_tag_relation.item_id IN (%3$s) GROUP BY %1$s.%2$s ORDER BY %4$s',
+					WHERE (tl_metamodel_tag_relation.item_id IN (%3$s)%5$s)
+					GROUP BY %1$s.%2$s ORDER BY %4$s',
 					$strTableName, // 1
 					$strColNameId, // 2
 					implode(',', $arrIds), // 3
-					$strSortColumn // 4
+					$strSortColumn, // 4
+					($strColNameWhere ? ' AND ('.$strColNameWhere.')' : '') //5
 				))
 				->execute($this->get('id'));
 
 			} else {
-				$objValue = $objDB->prepare(sprintf('SELECT %1$s.* FROM %1$s ORDER BY %2$s', $strTableName, $strSortColumn))
+				$objValue = $objDB->prepare(sprintf('
+					SELECT %1$s.*
+					FROM %1$s
+					%3$s
+					ORDER BY %2$s',
+					$strTableName, //1
+					$strSortColumn, //2
+					($strColNameWhere ? ' WHERE ('.$strColNameWhere.')' : '') //3
+				))
 				->execute();
 			}
 
