@@ -113,7 +113,10 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	 */
 	public function widgetToValue($varValue, $intId)
 	{
-		if (!is_array($varValue)) return array();
+		if ((!is_array($varValue)) || empty($varValue))
+		{
+			return array();
+		}
 
 		$arrSearch = array();
 		$arrParams = array();
