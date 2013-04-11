@@ -31,3 +31,4 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']              = array('Ta
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']           = array('Tag-Alias', 'Bitte einen Eintrag für den Tag-Alias auswählen');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting']         = array('Tag-Sortierung', 'Bitte einen Eintrag für die Tag-Sortierung auswählen.');
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where']           = array('SQL-Bedingung', 'Mit der Bedingung kann die Liste der Auswahlpunkte eingeschränkt werden.');
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']           = 'Die SQL-Bedingung erzeugt einen Fehler.';

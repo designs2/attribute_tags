@@ -153,7 +153,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	{
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
-		$strSortColumn = $this->get('tag_sorting');
+		$strSortColumn = $this->get('tag_sorting') ? $this->get('tag_sorting') : $strColNameId;
 		$strColNameWhere = ($this->get('tag_where') ? html_entity_decode($this->get('tag_where')) : false);
 
 		$arrReturn = array();
@@ -177,7 +177,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						)
 						WHERE (tl_metamodel_tag_relation.item_id IN (%3$s)%5$s)
 						GROUP BY %1$s.%2$s
-						ORDER BY %4$s
+						ORDER BY %1$s.%4$s
 					';
 				} else {
 					$strSQL = '
@@ -185,7 +185,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						FROM %1$s
 						WHERE %1$s.%2$s IN (%3$s)%5$s
 						GROUP BY %1$s.%2$s
-						ORDER BY %4$s';
+						ORDER BY %1$s.%4$s';
 				}
 
 				$objValue = $objDB->prepare(sprintf($strSQL, // Source
@@ -209,7 +209,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						WHERE rel.att_id=%4$s'
 						. ($strColNameWhere ? ' AND %5$s' : '') . '
 						GROUP BY %1$s.%3$s
-						ORDER BY %2$s';
+						ORDER BY %1$s.%2$s';
 				}
 				else
 				{
@@ -218,7 +218,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						FROM %1$s'
 						. ($strColNameWhere ? ' WHERE %5$s' : '') . '
 						GROUP BY %1$s.%3$s
-						ORDER BY %3$s';
+						ORDER BY %1$s.%2$s';
 				}
 
 				$objValue = $objDB->prepare(sprintf($strSQL, // Source
