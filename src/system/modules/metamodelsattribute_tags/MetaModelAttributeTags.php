@@ -70,6 +70,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			'tag_alias',
 			'tag_where',
 			'tag_sorting',
+			'tag_as_wizard',
 			'mandatory',
 			'filterable',
 			'searchable',
@@ -83,7 +84,17 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	{
 		// TODO: add tree support here.
 		$arrFieldDef=parent::getFieldDefinition($arrOverrides);
-		$arrFieldDef['inputType'] = 'checkbox';
+
+		// If tag as wizard is true, change the input type.
+		if ($arrOverrides['tag_as_wizard'] == true)
+		{
+			$arrFieldDef['inputType'] = 'checkboxWizard';
+		}
+		else
+		{
+			$arrFieldDef['inputType'] = 'checkbox';
+		}
+		
 		$arrFieldDef['options'] = $this->getFilterOptions(NULL, false);
 		$arrFieldDef['eval']['includeBlankOption'] = true;
 		$arrFieldDef['eval']['multiple'] = true;
@@ -138,8 +149,12 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 		while ($objValue->next())
 		{
+			// Adding the sorting from widget.
+			$strAlias = $this->getAliasCol();            
 			$arrResult[$objValue->$strColNameId] = $objValue->row();
+			$arrResult[$objValue->$strColNameId]['tag_value_sorting'] = array_search($objValue->$strAlias, $varValue);
 		}
+
 		return $arrResult;
 	}
 
@@ -270,7 +285,8 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 					(tl_metamodel_tag_relation.att_id=?)
 					AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
 				)
-				WHERE tl_metamodel_tag_relation.item_id IN (%4$s)',
+				WHERE tl_metamodel_tag_relation.item_id IN (%4$s)
+				ORDER BY tl_metamodel_tag_relation.value_sorting',
 				$strTableName, // 1
 				$strMetaModelTableNameId, // 2
 				$strColNameId, // 3
@@ -352,13 +368,35 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			{
 				foreach ($arrValuesToAdd as $intValueId)
 				{
-					$arrSQLInsertValues[] = sprintf('(%s,%s,%s)', $this->get('id'), $intItemId, $intValueId);
+					$arrSQLInsertValues[] = sprintf('(%s,%s,%s,%s)', $this->get('id'), $intItemId,  $arrTags[$intValueId]['tag_value_sorting'], $intValueId);
+				}
+			}
+			// Third pass, update all sorting values.
+			$arrValuesToUpdate = array_diff($arrTagIds, $arrValuesToAdd);           
+			if ($arrValuesToUpdate)
+			{
+				foreach ($arrValuesToUpdate as $intValueId)
+				{
+					if (!key_exists('tag_value_sorting', $arrTags[$intValueId]))
+					{
+						continue;
+					}
+
+					$objDB->prepare('
+						UPDATE tl_metamodel_tag_relation
+						SET value_sorting = ' . $arrTags[$intValueId]['tag_value_sorting'] . '
+						WHERE
+						att_id=?
+						AND item_id=?
+						AND value_id=?')
+					->execute($this->get('id'), $intItemId, $intValueId);
 				}
 			}
 		}
+
 		if ($arrSQLInsertValues)
 		{
-			$objDB->execute('INSERT INTO tl_metamodel_tag_relation (att_id, item_id, value_id) VALUES ' . implode(',', $arrSQLInsertValues));
+			$objDB->execute('INSERT INTO tl_metamodel_tag_relation (att_id, item_id, value_sorting, value_id) VALUES ' . implode(',', $arrSQLInsertValues));
 		}
 	}
 

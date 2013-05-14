@@ -19,6 +19,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id'
 (
 	'presentation' => array(
 		'tl_class',
+		'tag_as_wizard'
 	),
 	'functions'  => array(
 		'mandatory'
@@ -26,5 +27,16 @@ $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id'
 	'overview' => array(
 		'filterable',
 		'searchable',
+	)
+);
+
+$GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['fields']['tag_as_wizard'] = array
+(
+	'label'      => &$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard'],
+	'exclude'    => true,
+	'inputType'  => 'checkbox',
+	'eval'       => array
+	(
+		'tl_class'   => 'clr m12'
 	)
 );
