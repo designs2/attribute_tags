@@ -164,7 +164,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	 * Fetch filter options from foreign table.
 	 *
 	 */
-	public function getFilterOptions($arrIds, $usedOnly)
+	public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
 	{
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
@@ -184,7 +184,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				if($usedOnly)
 				{
 					$strSQL = '
-						SELECT %1$s.*
+						SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
 						FROM %1$s
 						LEFT JOIN tl_metamodel_tag_relation ON (
 							(tl_metamodel_tag_relation.att_id=?)
@@ -196,7 +196,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 					';
 				} else {
 					$strSQL = '
-						SELECT %1$s.*
+						SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
 						FROM %1$s
 						WHERE %1$s.%2$s IN (%3$s)%5$s
 						GROUP BY %1$s.%2$s
@@ -215,7 +215,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				if($usedOnly)
 				{
 					$strSQL = '
-						SELECT %1$s.*
+						SELECT COUNT(%1$s.%3$s) as mm_count, %1$s.*
 						FROM %1$s
 						INNER JOIN tl_metamodel_tag_relation as rel
 						ON (
@@ -229,7 +229,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				else
 				{
 					$strSQL = '
-						SELECT %1$s.*
+						SELECT COUNT(%1$s.%3$s) as mm_count, %1$s.*
 						FROM %1$s'
 						. ($strColNameWhere ? ' WHERE %5$s' : '') . '
 						GROUP BY %1$s.%3$s
@@ -247,6 +247,11 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 			while ($objValue->next())
 			{
+				if(is_array($arrCount))
+				{
+					$arrCount[$objValue->$strColNameAlias] = $objValue->mm_count;
+				}
+				
 				$arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
 			}
 		}
