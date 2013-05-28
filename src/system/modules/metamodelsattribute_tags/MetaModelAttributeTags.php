@@ -181,8 +181,11 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 					';
 				} else {
 					$strSQL = '
-						SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
+						SELECT COUNT(rel.value_id) as mm_count, %1$s.*
 						FROM %1$s
+						LEFT JOIN tl_metamodel_tag_relation as rel ON (
+							(rel.att_id=?) AND (rel.value_id=%1$s.%2$s)
+						)
 						WHERE %1$s.%2$s IN (%3$s)%5$s
 						GROUP BY %1$s.%2$s
 						ORDER BY %1$s.%4$s';
@@ -214,8 +217,12 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				else
 				{
 					$strSQL = '
-						SELECT COUNT(%1$s.%3$s) as mm_count, %1$s.*
-						FROM %1$s'
+						SELECT COUNT(rel.value_id) as mm_count, %1$s.*
+						FROM %1$s
+						LEFT JOIN tl_metamodel_tag_relation as rel
+						ON (
+							(rel.att_id="%4$s") AND (rel.value_id=%1$s.%3$s)
+						)'
 						. ($strColNameWhere ? ' WHERE %5$s' : '') . '
 						GROUP BY %1$s.%3$s
 						ORDER BY %1$s.%2$s';
