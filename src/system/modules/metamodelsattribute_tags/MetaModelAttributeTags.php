@@ -94,7 +94,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		{
 			$arrFieldDef['inputType'] = 'checkbox';
 		}
-		
+
 		$arrFieldDef['options'] = $this->getFilterOptions(NULL, false);
 		$arrFieldDef['eval']['includeBlankOption'] = true;
 		$arrFieldDef['eval']['multiple'] = true;
@@ -150,7 +150,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		while ($objValue->next())
 		{
 			// Adding the sorting from widget.
-			$strAlias = $this->getAliasCol();            
+			$strAlias = $this->getAliasCol();
 			$arrResult[$objValue->$strColNameId] = $objValue->row();
 			$arrResult[$objValue->$strColNameId]['tag_value_sorting'] = array_search($objValue->$strAlias, $varValue);
 		}
@@ -196,8 +196,15 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 					';
 				} else {
 					$strSQL = '
+<<<<<<< HEAD
 						SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
+=======
+						SELECT COUNT(rel.value_id) as mm_count, %1$s.*
+>>>>>>> master
 						FROM %1$s
+						LEFT JOIN tl_metamodel_tag_relation as rel ON (
+							(rel.att_id=?) AND (rel.value_id=%1$s.%2$s)
+						)
 						WHERE %1$s.%2$s IN (%3$s)%5$s
 						GROUP BY %1$s.%2$s
 						ORDER BY %1$s.%4$s';
@@ -229,8 +236,12 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				else
 				{
 					$strSQL = '
-						SELECT COUNT(%1$s.%3$s) as mm_count, %1$s.*
-						FROM %1$s'
+						SELECT COUNT(rel.value_id) as mm_count, %1$s.*
+						FROM %1$s
+						LEFT JOIN tl_metamodel_tag_relation as rel
+						ON (
+							(rel.att_id="%4$s") AND (rel.value_id=%1$s.%3$s)
+						)'
 						. ($strColNameWhere ? ' WHERE %5$s' : '') . '
 						GROUP BY %1$s.%3$s
 						ORDER BY %1$s.%2$s';
@@ -251,7 +262,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				{
 					$arrCount[$objValue->$strColNameAlias] = $objValue->mm_count;
 				}
-				
+
 				$arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
 			}
 		}
@@ -377,7 +388,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				}
 			}
 			// Third pass, update all sorting values.
-			$arrValuesToUpdate = array_diff($arrTagIds, $arrValuesToAdd);           
+			$arrValuesToUpdate = array_diff($arrTagIds, $arrValuesToAdd);
 			if ($arrValuesToUpdate)
 			{
 				foreach ($arrValuesToUpdate as $intValueId)
