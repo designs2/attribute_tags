@@ -196,11 +196,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 					';
 				} else {
 					$strSQL = '
-<<<<<<< HEAD
-						SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
-=======
 						SELECT COUNT(rel.value_id) as mm_count, %1$s.*
->>>>>>> master
 						FROM %1$s
 						LEFT JOIN tl_metamodel_tag_relation as rel ON (
 							(rel.att_id=?) AND (rel.value_id=%1$s.%2$s)
