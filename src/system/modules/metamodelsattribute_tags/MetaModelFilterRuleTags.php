@@ -44,8 +44,16 @@ class MetaModelFilterRuleTags extends MetaModelFilterRule
 
 		if ($strColNameAlias)
 		{
-			$arrLookup = array_map('mysql_real_escape_string', $arrValues);
-			$objSelectIds = $objDB->execute('SELECT ' . $strColNameId . ' FROM ' . $strTableNameId . ' WHERE ' . $strColNameAlias . ' IN (\'' . implode('\',\'', $arrLookup) . '\')');
+			$objSelectIds = $objDB
+				->prepare(
+					sprintf('SELECT %1$s FROM %2$s WHERE %3$s IN (%s)',
+						$strColNameId,
+						$strTableNameId,
+						$strColNameAlias,
+						implode(',', array_fill(0, count($arrValues), '?'))
+					)
+				)
+				->execute($arrValues);
 
 			$arrValues = $objSelectIds->fetchEach($strColNameId);
 		} else {
@@ -62,7 +70,9 @@ class MetaModelFilterRuleTags extends MetaModelFilterRule
 		$arrValues = $this->sanitizeValue();
 		
 		$objDB = Database::getInstance();
-		$objMatches = $objDB->prepare('SELECT item_id as id FROM tl_metamodel_tag_relation WHERE value_id IN (' . implode(',', $arrValues) . ') AND att_id = ?')->execute($this->objAttribute->get('id'));
+		$objMatches = $objDB
+			->prepare('SELECT item_id as id FROM tl_metamodel_tag_relation WHERE value_id IN (' . implode(',', $arrValues) . ') AND att_id = ?')
+			->execute($this->objAttribute->get('id'));
 		return $objMatches->fetchEach('id');
 	}
 }
