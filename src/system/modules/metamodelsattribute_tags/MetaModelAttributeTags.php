@@ -380,7 +380,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			{
 				foreach ($arrValuesToAdd as $intValueId)
 				{
-					$arrSQLInsertValues[] = sprintf('(%s,%s,%s,%s)', $this->get('id'), $intItemId,  $arrTags[$intValueId]['tag_value_sorting'], $intValueId);
+					$arrSQLInsertValues[] = sprintf('(%s,%s,%s,%s)', $this->get('id'), $intItemId,  $arrTags[$intValueId]['sorting'], $intValueId);
 				}
 			}
 			// Third pass, update all sorting values.
