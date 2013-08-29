@@ -68,7 +68,13 @@ class MetaModelFilterRuleTags extends MetaModelFilterRule
 	public function getMatchingIds()
 	{
 		$arrValues = $this->sanitizeValue();
-		
+
+		// Get out when no values are available.
+		if (!$arrValues)
+		{
+			return array();
+		}
+
 		$objDB = Database::getInstance();
 		$objMatches = $objDB
 			->prepare('SELECT item_id as id FROM tl_metamodel_tag_relation WHERE value_id IN (' . implode(',', $arrValues) . ') AND att_id = ?')
