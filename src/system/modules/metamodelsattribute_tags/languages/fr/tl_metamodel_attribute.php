@@ -8,10 +8,10 @@
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  *
- * last-updated: 2013-05-13T22:13:15+02:00
+ * last-updated: 2013-05-13T23:09:29+02:00
  */
 
-
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['display_legend'] = 'Paramètres d\'affichage';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']      = 'La requête SQL provoque une erreur.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where']['0'] = 'SQL';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where']['1'] = 'La liste des options peut être limitée par l\'utilisation de SQL.';
