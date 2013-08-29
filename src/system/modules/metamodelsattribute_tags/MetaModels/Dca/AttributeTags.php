@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The MetaModels extension allows the creation of multiple collections of custom items,
  * each with its own unique set of selectable attributes, with attribute extendability.
@@ -16,17 +15,21 @@
  * @filesource
  */
 
+namespace MetaModels\Dca;
+
+use DcGeneral\DataContainerInterface;
+
 /**
  * Supplementary class for handling DCA information for select attributes.
  *
- * @package	   MetaModels
+ * @package    MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
-class TableMetaModelsAttributeTags extends TableMetaModelAttribute
+class AttributeTags extends Attribute
 {
 	/**
-	 * @var TableMetaModelRenderSetting
+	 * @var AttributeTags
 	 */
 	protected static $objInstance = null;
 
@@ -34,30 +37,30 @@ class TableMetaModelsAttributeTags extends TableMetaModelAttribute
 	 * Get the static instance.
 	 *
 	 * @static
-	 * @return MetaPalettes
+	 * @return AttributeTags
 	 */
 	public static function getInstance()
 	{
 		if (self::$objInstance == null) {
-			self::$objInstance = new TableMetaModelsAttributeTags();
+			self::$objInstance = new AttributeTags();
 		}
 		return self::$objInstance;
 	}
 
 	public function getTableNames()
 	{
-		$objDB = Database::getInstance();
+		$objDB = \Database::getInstance();
 		return $objDB->listTables();
 	}
 
-	public function getColumnNames(DataContainer $objDC)
+	public function getColumnNames(DataContainerInterface $objDC)
 	{
 		$arrFields = array();
 
-		if (($objDC->getCurrentModel())
-		    && $this->Database->tableExists($objDC->getCurrentModel()->getProperty('tag_table')))
+		if (($objDC->getEnvironment()->getCurrentModel())
+			&& \Database::getInstance()->tableExists($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')))
 		{
-			foreach ($this->Database->listFields($objDC->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
+			foreach (\Database::getInstance()->listFields($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
 			{
 				if ($arrInfo['type'] != 'index')
 				{
@@ -69,14 +72,14 @@ class TableMetaModelsAttributeTags extends TableMetaModelAttribute
 		return $arrFields;
 	}
 
-	public function getIntColumnNames(DataContainer $objDC)
+	public function getIntColumnNames(DataContainerInterface $objDC)
 	{
 		$arrFields = array();
 
-		if (($objDC->getCurrentModel())
-		    && $this->Database->tableExists($objDC->getCurrentModel()->getProperty('tag_table')))
+		if (($objDC->getEnvironment()->getCurrentModel())
+			&& \Database::getInstance()->tableExists($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')))
 		{
-			foreach ($this->Database->listFields($objDC->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
+			foreach (\Database::getInstance()->listFields($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
 			{
 				if ($arrInfo['type'] != 'index' && $arrInfo['type'] == 'int')
 				{
@@ -88,33 +91,34 @@ class TableMetaModelsAttributeTags extends TableMetaModelAttribute
 		return $arrFields;
 	}
 
-	public function checkQuery($varValue, DataContainer $objDC)
+	public function checkQuery($varValue, DataContainerInterface $objDC)
 	{
-		if ($objDC->getCurrentModel() && $varValue)
+		if ($objDC->getEnvironment()->getCurrentModel() && $varValue)
 		{
-			$objDB = Database::getInstance();
+			$objDB = \Database::getInstance();
+			$objModel = $objDC->getEnvironment()->getCurrentModel();
 
-			$strTableName = $objDC->getCurrentModel()->getProperty('tag_table');
-			$strColNameId = $objDC->getCurrentModel()->getProperty('tag_id');
-			$strColNameValue = $objDC->getCurrentModel()->getProperty('tag_column');
-			$strColNameAlias = $objDC->getCurrentModel()->getProperty('tag_alias') ? $objDC->getCurrentModel()->getProperty('tag_alias') : $strColNameId;
-			$strSortColumn = $objDC->getCurrentModel()->getProperty('tag_sorting') ? $objDC->getCurrentModel()->getProperty('tag_sorting') : $strColNameId;
+			$strTableName = $objModel->getProperty('tag_table');
+			$strColNameId = $objModel->getProperty('tag_id');
+			$strColNameValue = $objModel->getProperty('tag_column');
+			$strColNameAlias = $objModel->getProperty('tag_alias') ? $objModel->getProperty('tag_alias') : $strColNameId;
+			$strSortColumn = $objModel->getProperty('tag_sorting') ? $objModel->getProperty('tag_sorting') : $strColNameId;
 
 			$strColNameWhere = $varValue;
 
 			$strQuery = sprintf('SELECT %1$s.*
 			FROM %1$s%2$s ORDER BY %1$s.%3$s',
-			$strTableName, //1
-			($strColNameWhere ? ' WHERE ('.$strColNameWhere.')' : false), //2
-			$strSortColumn // 3
+				$strTableName, //1
+				($strColNameWhere ? ' WHERE ('.$strColNameWhere.')' : false), //2
+				$strSortColumn // 3
 			);
 
 			try
 			{
 				$objValue = $objDB->prepare($strQuery)
-				->execute();
+					->execute();
 			}
-			catch(Exception $e)
+			catch(\Exception $e)
 			{
 				// add error
 				$objDC->addError($GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']);
@@ -123,7 +127,7 @@ class TableMetaModelsAttributeTags extends TableMetaModelAttribute
 				$this->log($e->getMessage(), 'TableMetaModelsAttributeTags checkQuery()', TL_ERROR);
 
 				// keep the current value
-				return $objDC->getCurrentModel()->getProperty('tag_where');
+				return $objModel->getProperty('tag_where');
 			}
 		}
 

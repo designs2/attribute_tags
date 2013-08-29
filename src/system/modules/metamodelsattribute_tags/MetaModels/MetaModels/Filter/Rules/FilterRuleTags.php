@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The MetaModels extension allows the creation of multiple collections of custom items,
  * each with its own unique set of selectable attributes, with attribute extendability.
@@ -15,17 +14,22 @@
  * @filesource
  */
 
+namespace MetaModels\Filter\Rules;
+
+use MetaModels\Attribute\Tags\Tags;
+use MetaModels\Filter\FilterRule;
+
 /**
  * This is the MetaModelFilterRule class for handling select fields.
- * 
+ *
  * @package	   MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
-class MetaModelFilterRuleTags extends MetaModelFilterRule
+class FilterRuleTags extends FilterRule
 {
 
-	public function __construct(MetaModelAttributeTags $objAttribute, $strValue)
+	public function __construct(Tags $objAttribute, $strValue)
 	{
 		parent::__construct();
 		$this->objAttribute = $objAttribute;
@@ -37,10 +41,10 @@ class MetaModelFilterRuleTags extends MetaModelFilterRule
 		$strTableNameId = $this->objAttribute->get('tag_table');
 		$strColNameId = $this->objAttribute->get('tag_id');
 		$strColNameAlias = $this->objAttribute->get('tag_alias');
-		
+
 		$arrValues = is_array($this->value) ? $this->value : explode(',', $this->value);
 
-		$objDB = Database::getInstance();
+		$objDB = \Database::getInstance();
 
 		if ($strColNameAlias)
 		{
@@ -75,7 +79,7 @@ class MetaModelFilterRuleTags extends MetaModelFilterRule
 			return array();
 		}
 
-		$objDB = Database::getInstance();
+		$objDB = \Database::getInstance();
 		$objMatches = $objDB
 			->prepare('SELECT item_id as id FROM tl_metamodel_tag_relation WHERE value_id IN (' . implode(',', $arrValues) . ') AND att_id = ?')
 			->execute($this->objAttribute->get('id'));

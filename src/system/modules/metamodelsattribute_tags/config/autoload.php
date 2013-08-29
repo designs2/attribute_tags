@@ -21,9 +21,13 @@
  */
 ClassLoader::addClasses(array
 (
-	'MetaModelAttributeTags'              => 'system/modules/metamodelsattribute_tags/MetaModelAttributeTags.php',
-	'MetaModelFilterRuleTags'             => 'system/modules/metamodelsattribute_tags/MetaModelFilterRuleTags.php',
-	'TableMetaModelsAttributeTags'        => 'system/modules/metamodelsattribute_tags/TableMetaModelsAttributeTags.php',
+	'MetaModels\Attribute\Tags\Tags'         => 'system/modules/metamodelsattribute_tags/MetaModels/Attribute/Tags/Tags.php',
+	'MetaModels\Filter\Rules\FilterRuleTags' => 'system/modules/metamodelsattribute_tags/MetaModels/Filter/Rules/FilterRuleTags.php',
+	'MetaModels\Dca\AttributeTags'           => 'system/modules/metamodelsattribute_tags/MetaModels/Dca/AttributeTags.php',
+
+	'MetaModelAttributeTags'                 => 'system/modules/metamodelsattribute_tags/deprecated/MetaModelAttributeTags.php',
+	'MetaModelFilterRuleTags'                => 'system/modules/metamodelsattribute_tags/deprecated/MetaModelFilterRuleTags.php',
+	'TableMetaModelsAttributeTags'           => 'system/modules/metamodelsattribute_tags/deprecated/TableMetaModelsAttributeTags.php',
 ));
 
 

@@ -16,6 +16,12 @@
  * @filesource
  */
 
+namespace MetaModels\Attribute\Tags;
+
+use MetaModels\Attribute\BaseComplex;
+use MetaModels\Render\Template;
+use MetaModels\Filter\Rules\FilterRuleTags;
+
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
  *
@@ -24,13 +30,12 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Christian de la Haye <service@delahaye.de>
  */
-class MetaModelAttributeTags extends MetaModelAttributeComplex
+class Tags extends BaseComplex
 {
-
 	/**
 	 * when rendered via a template, this returns the values to be stored in the template.
 	 */
-	protected function prepareTemplate(MetaModelTemplate $objTemplate, $arrRowData, $objSettings = null)
+	protected function prepareTemplate(Template $objTemplate, $arrRowData, $objSettings = null)
 	{
 		parent::prepareTemplate($objTemplate, $arrRowData, $objSettings);
 		$objTemplate->alias = $this->get('tag_alias');
@@ -53,10 +58,6 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		}
 		return $strColNameAlias;
 	}
-
-	/////////////////////////////////////////////////////////////////
-	// interface IMetaModelAttribute
-	/////////////////////////////////////////////////////////////////
 
 	/**
 	 * {@inheritdoc}
@@ -136,13 +137,13 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 			$arrSearch[] = '?';
 			$arrParams[] = $strValue;
 		}
-		$objDB = Database::getInstance();
+		$objDB = \Database::getInstance();
 		$objValue = $objDB->prepare(sprintf('SELECT %1$s.* FROM %1$s WHERE %2$s IN (%3$s)',
 			$this->get('tag_table'),
 			$this->getAliasCol(),
 			implode(',', $arrSearch)
 		))
-		->execute($arrParams);
+			->execute($arrParams);
 
 		$strColNameId = $this->get('tag_id');
 		$arrResult = array();
@@ -177,7 +178,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		{
 			$strColNameValue = $this->get('tag_column');
 			$strColNameAlias = $this->getAliasCol();
-			$objDB = Database::getInstance();
+			$objDB = \Database::getInstance();
 
 			if ($arrIds)
 			{
@@ -270,7 +271,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 	 */
 	public function searchFor($strPattern)
 	{
-		$objFilterRule = new MetaModelFilterRuleTags($this, $strPattern);
+		$objFilterRule = new FilterRuleTags($this, $strPattern);
 		return $objFilterRule->getMatchingIds();
 	}
 
@@ -286,7 +287,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 		if ($strTableName && $strColNameId)
 		{
-			$objDB = Database::getInstance();
+			$objDB = \Database::getInstance();
 			$strMetaModelTableName = $this->getMetaModel()->getTableName();
 			$strMetaModelTableNameId = $strMetaModelTableName.'_id';
 
@@ -304,7 +305,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				$strColNameId, // 3
 				implode(',', $arrIds) // 4
 			))
-			->execute($this->get('id'));
+				->execute($this->get('id'));
 
 			while ($objValue->next())
 			{
@@ -322,7 +323,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 
 	public function setDataFor($arrValues)
 	{
-		$objDB = Database::getInstance();
+		$objDB = \Database::getInstance();
 		$arrItemIds = array_map('intval', array_keys($arrValues));
 		sort($arrItemIds);
 		// load all existing tags for all items to be updated, keep the ordering to item Id
@@ -334,7 +335,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		AND item_id IN (%1$s)
 		ORDER BY item_id ASC
 		', implode(',', $arrItemIds)))
-		->execute($this->get('id'));
+			->execute($this->get('id'));
 
 		// now loop over all items and update the values for them.
 		// NOTE: we can not loop over the original array, as the item ids are not neccessarily
@@ -372,7 +373,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				AND item_id=?
 				AND value_id IN (%s)
 				', implode(',', $arrValuesToRemove)))
-				->execute($this->get('id'), $intItemId);
+					->execute($this->get('id'), $intItemId);
 			}
 			// second pass, add all new values in a row.
 			$arrValuesToAdd = array_diff($arrTagIds, $arrThisExisting);
@@ -401,7 +402,7 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 						att_id=?
 						AND item_id=?
 						AND value_id=?')
-					->execute($this->get('id'), $intItemId, $intValueId);
+						->execute($this->get('id'), $intItemId, $intValueId);
 				}
 			}
 		}
@@ -417,8 +418,8 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 		if ($arrIds)
 		{
 			if (!is_array($arrIds))
-				throw new Exception('MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.', 1);
-			$objDB = Database::getInstance();
+				throw new \RuntimeException('MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.', 1);
+			$objDB = \Database::getInstance();
 			$objDB->prepare(sprintf('
 				DELETE FROM tl_metamodel_tag_relation
 				WHERE
@@ -426,6 +427,5 @@ class MetaModelAttributeTags extends MetaModelAttributeComplex
 				AND item_id IN (%s)',
 				implode(',', $arrIds)))->execute($this->get('id'));
 		}
-
 	}
 }
