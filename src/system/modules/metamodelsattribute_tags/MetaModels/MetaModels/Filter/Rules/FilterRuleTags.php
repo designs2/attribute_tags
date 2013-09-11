@@ -50,7 +50,7 @@ class FilterRuleTags extends FilterRule
 		{
 			$objSelectIds = $objDB
 				->prepare(
-					sprintf('SELECT %1$s FROM %2$s WHERE %3$s IN (%s)',
+					sprintf('SELECT %1$s FROM %2$s WHERE %3$s IN (%4$s)',
 						$strColNameId,
 						$strTableNameId,
 						$strColNameAlias,
