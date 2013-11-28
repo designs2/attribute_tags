@@ -381,7 +381,13 @@ class Tags extends BaseComplex
 			{
 				foreach ($arrValuesToAdd as $intValueId)
 				{
-					$arrSQLInsertValues[] = sprintf('(%s,%s,%s,%s)', $this->get('id'), $intItemId,  $arrTags[$intValueId]['sorting'], $intValueId);
+					$arrSQLInsertValues[] = sprintf(
+						'(%s,%s,%s,%s)',
+						$this->get('id'),
+						$intItemId,
+						(int)$arrTags[$intValueId]['tag_value_sorting'],
+						$intValueId
+					);
 				}
 			}
 			// Third pass, update all sorting values.
@@ -390,14 +396,14 @@ class Tags extends BaseComplex
 			{
 				foreach ($arrValuesToUpdate as $intValueId)
 				{
-					if (!key_exists('tag_value_sorting', $arrTags[$intValueId]))
+					if (!array_key_exists('tag_value_sorting', $arrTags[$intValueId]))
 					{
 						continue;
 					}
 
 					$objDB->prepare('
 						UPDATE tl_metamodel_tag_relation
-						SET value_sorting = ' . $arrTags[$intValueId]['tag_value_sorting'] . '
+						SET value_sorting = ' . (int)$arrTags[$intValueId]['tag_value_sorting'] . '
 						WHERE
 						att_id=?
 						AND item_id=?
