@@ -27,99 +27,105 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tags extends _simp
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_table'] = array
 (
-	'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table'],
-	'exclude'               => true,
-	'inputType'             => 'select',
-	'options_callback'      => array('MetaModels\Dca\AttributeTags', 'getTableNames'),
-	'eval'                  => array
+	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table'],
+	'exclude'                => true,
+	'inputType'              => 'select',
+	// FIXME: change to event based approach.
+	'options_callback'       => array('MetaModels\Dca\AttributeTags', 'getTableNames'),
+	'eval'                   => array
 	(
 		'includeBlankOption' => true,
-		'doNotSaveEmpty' => true,
-		'alwaysSave' => true,
-		'submitOnChange'=> true,
-		'tl_class' => 'w50',
-		'chosen' => 'true'
+		'doNotSaveEmpty'     => true,
+		'alwaysSave'         => true,
+		'submitOnChange'     => true,
+		'tl_class'           => 'w50',
+		'chosen'             => 'true'
 	),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_column'] = array
 (
-	'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column'],
-	'exclude'               => true,
-	'inputType'             => 'select',
-	'options_callback'      => array('MetaModels\Dca\AttributeTags', 'getColumnNames'),
-	'eval'                  => array
+	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column'],
+	'exclude'                => true,
+	'inputType'              => 'select',
+	// FIXME: change to event based approach.
+	'options_callback'       => array('MetaModels\Dca\AttributeTags', 'getColumnNames'),
+	'eval'                   => array
 	(
 		'includeBlankOption' => true,
-		'doNotSaveEmpty' => true,
-		'alwaysSave' => true,
-		'submitOnChange'=> true,
-		'tl_class' => 'w50',
-		'chosen' => 'true'
+		'doNotSaveEmpty'     => true,
+		'alwaysSave'         => true,
+		'submitOnChange'     => true,
+		'tl_class'           => 'w50',
+		'chosen'             => 'true'
 	),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_id'] = array
 (
-	'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id'],
-	'exclude'               => true,
-	'inputType'             => 'select',
-	'options_callback'      => array('MetaModels\Dca\AttributeTags', 'getIntColumnNames'),
-	'eval'                  => array
+	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id'],
+	'exclude'                => true,
+	'inputType'              => 'select',
+	// FIXME: change to event based approach.
+	'options_callback'       => array('MetaModels\Dca\AttributeTags', 'getIntColumnNames'),
+	'eval'                   => array
 	(
 		'includeBlankOption' => true,
-		'doNotSaveEmpty' => true,
-		'alwaysSave' => true,
-		'submitOnChange'=> true,
-		'tl_class' => 'w50',
-		'chosen' => 'true'
+		'doNotSaveEmpty'     => true,
+		'alwaysSave'         => true,
+		'submitOnChange'     => true,
+		'tl_class'           => 'w50',
+		'chosen'             => 'true'
 	),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_alias'] = array
 (
-	'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias'],
-	'exclude'               => true,
-	'inputType'             => 'select',
-	'options_callback'      => array('MetaModels\Dca\AttributeTags', 'getColumnNames'),
-	'eval'                  => array
+	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias'],
+	'exclude'                => true,
+	'inputType'              => 'select',
+	// FIXME: change to event based approach.
+	'options_callback'       => array('MetaModels\Dca\AttributeTags', 'getColumnNames'),
+	'eval'                   => array
 	(
 		'includeBlankOption' => true,
-		'doNotSaveEmpty' => true,
-		'alwaysSave' => true,
-		'submitOnChange'=> true,
-		'tl_class' => 'w50',
-		'chosen' => 'true'
+		'doNotSaveEmpty'     => true,
+		'alwaysSave'         => true,
+		'submitOnChange'     => true,
+		'tl_class'           => 'w50',
+		'chosen'             => 'true'
 	),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_sorting'] = array
 (
-    'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting'],
-    'exclude'               => true,
-    'inputType'             => 'select',
-    'options_callback'      => array('MetaModels\Dca\AttributeTags', 'getColumnNames'),
-    'eval'                  => array
-    (
-        'includeBlankOption' => true,
-        'doNotSaveEmpty' => true,
-        'alwaysSave' => true,
-        'submitOnChange'=> true,
-        'tl_class' => 'w50',
-        'chosen' => 'true'
-    ),
+	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting'],
+	'exclude'                => true,
+	'inputType'              => 'select',
+	// FIXME: change to event based approach.
+	'options_callback'       => array('MetaModels\Dca\AttributeTags', 'getColumnNames'),
+	'eval'                   => array
+	(
+		'includeBlankOption' => true,
+		'doNotSaveEmpty'     => true,
+		'alwaysSave'         => true,
+		'submitOnChange'     => true,
+		'tl_class'           => 'w50',
+		'chosen'             => 'true'
+	),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_where'] = array
 (
-	'label'                 => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where'],
-	'exclude'               => true,
-	'inputType'             => 'textarea',
-	'save_callback'         => array(array('MetaModels\Dca\AttributeTags', 'checkQuery')),
-	'eval'                  => array
+	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where'],
+	'exclude'                => true,
+	'inputType'              => 'textarea',
+	// FIXME: change to event based approach.
+	'save_callback'          => array(array('MetaModels\Dca\AttributeTags', 'checkQuery')),
+	'eval'                   => array
 	(
-		'tl_class'=>'clr',
-		'style'=>'height: 4em;',
-		'decodeEntities'=>'true'
+		'tl_class'           => 'clr',
+		'style'              => 'height: 4em;',
+		'decodeEntities'     => 'true'
 	)
 );

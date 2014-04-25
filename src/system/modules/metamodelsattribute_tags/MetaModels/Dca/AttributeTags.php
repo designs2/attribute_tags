@@ -30,6 +30,8 @@ use MetaModels\Helper\ContaoController;
 class AttributeTags extends Attribute
 {
 	/**
+	 * The singleton instance.
+	 *
 	 * @var AttributeTags
 	 */
 	protected static $objInstance = null;
@@ -42,26 +44,41 @@ class AttributeTags extends Attribute
 	 */
 	public static function getInstance()
 	{
-		if (self::$objInstance == null) {
+		if (self::$objInstance == null)
+		{
 			self::$objInstance = new AttributeTags();
 		}
 		return self::$objInstance;
 	}
 
+	/**
+	 * Retrieve all database table names.
+	 *
+	 * @return array
+	 */
 	public function getTableNames()
 	{
 		$objDB = \Database::getInstance();
 		return $objDB->listTables();
 	}
 
+	/**
+	 * Retrieve all column names for the current selected table.
+	 *
+	 * @param DataContainerInterface $objDC The data container.
+	 *
+	 * @return array
+	 */
 	public function getColumnNames(DataContainerInterface $objDC)
 	{
 		$arrFields = array();
+		$objDB     = \Database::getInstance();
+		$model     = $objDC->getEnvironment()->getCurrentModel();
 
-		if (($objDC->getEnvironment()->getCurrentModel())
-			&& \Database::getInstance()->tableExists($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')))
+		if ($model
+			&& $objDB->tableExists($model->getProperty('tag_table')))
 		{
-			foreach (\Database::getInstance()->listFields($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
+			foreach ($objDB->listFields($model->getProperty('tag_table')) as $arrInfo)
 			{
 				if ($arrInfo['type'] != 'index')
 				{
@@ -73,14 +90,23 @@ class AttributeTags extends Attribute
 		return $arrFields;
 	}
 
+	/**
+	 * Retrieve all column names of type int for the current selected table.
+	 *
+	 * @param DataContainerInterface $objDC The data container.
+	 *
+	 * @return array
+	 */
 	public function getIntColumnNames(DataContainerInterface $objDC)
 	{
 		$arrFields = array();
+		$objDB     = \Database::getInstance();
+		$model     = $objDC->getEnvironment()->getCurrentModel();
 
-		if (($objDC->getEnvironment()->getCurrentModel())
-			&& \Database::getInstance()->tableExists($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')))
+		if ($model
+			&& $objDB->tableExists($model->getProperty('tag_table')))
 		{
-			foreach (\Database::getInstance()->listFields($objDC->getEnvironment()->getCurrentModel()->getProperty('tag_table')) as $arrInfo)
+			foreach ($objDB->listFields($model->getProperty('tag_table')) as $arrInfo)
 			{
 				if ($arrInfo['type'] != 'index' && $arrInfo['type'] == 'int')
 				{
@@ -92,45 +118,60 @@ class AttributeTags extends Attribute
 		return $arrFields;
 	}
 
+	/**
+	 * Check if the select_where value is valid by firing a test query.
+	 *
+	 * @param string                 $varValue The where condition to test.
+	 *
+	 * @param DataContainerInterface $objDC    The data container.
+	 *
+	 * @return array
+	 */
 	public function checkQuery($varValue, DataContainerInterface $objDC)
 	{
-		if ($objDC->getEnvironment()->getCurrentModel() && $varValue)
+		$objModel = $objDC->getEnvironment()->getCurrentModel();
+
+		if ($objModel && $varValue)
 		{
 			$objDB = \Database::getInstance();
-			$objModel = $objDC->getEnvironment()->getCurrentModel();
 
-			$strTableName = $objModel->getProperty('tag_table');
-			$strColNameId = $objModel->getProperty('tag_id');
-			$strColNameValue = $objModel->getProperty('tag_column');
-			$strColNameAlias = $objModel->getProperty('tag_alias') ? $objModel->getProperty('tag_alias') : $strColNameId;
-			$strSortColumn = $objModel->getProperty('tag_sorting') ? $objModel->getProperty('tag_sorting') : $strColNameId;
+			$strTableName  = $objModel->getProperty('tag_table');
+			$strColNameId  = $objModel->getProperty('tag_id');
+			$strSortColumn = $objModel->getProperty('tag_sorting') ?: $strColNameId;
 
 			$strColNameWhere = $varValue;
 
-			$strQuery = sprintf('SELECT %1$s.*
-			FROM %1$s%2$s ORDER BY %1$s.%3$s',
-				$strTableName, //1
-				($strColNameWhere ? ' WHERE ('.$strColNameWhere.')' : false), //2
-				$strSortColumn // 3
+			$strQuery = sprintf('
+				SELECT %1$s.*
+				FROM %1$s%2$s
+				ORDER BY %1$s.%3$s',
+				// @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+				$strTableName,                                                // 1
+				($strColNameWhere ? ' WHERE ('.$strColNameWhere.')' : false), // 2
+				$strSortColumn                                                // 3
+				// @codingStandardsIgnoreEnd
 			);
 
-			// replace inserttags but do not cache
+			// Replace inserttags but do not cache.
+			// FIXME: remove dependency on deprecated ContaoController.
 			$strQuery = ContaoController::getInstance()->replaceInsertTags($strQuery, false);
 
 			try
 			{
-				$objValue = $objDB->prepare($strQuery)
+				$objDB
+					->prepare($strQuery)
 					->execute();
 			}
 			catch(\Exception $e)
 			{
-				// add error
+				// FIXME: These methods are not available anymore.
+				// Add error.
 				$objDC->addError($GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']);
 
-				// log error
+				// Log error.
 				$this->log($e->getMessage(), 'TableMetaModelsAttributeTags checkQuery()', TL_ERROR);
 
-				// keep the current value
+				// Keep the current value.
 				return $objModel->getProperty('tag_where');
 			}
 		}

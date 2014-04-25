@@ -28,18 +28,40 @@ use MetaModels\Filter\FilterRule;
  */
 class FilterRuleTags extends FilterRule
 {
+	/**
+	 * The attribute to filter.
+	 *
+	 * @var Tags
+	 */
+	protected $objAttribute;
 
+	/**
+	 * The filter value.
+	 *
+	 * @var string
+	 */
+	protected $value;
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function __construct(Tags $objAttribute, $strValue)
 	{
 		parent::__construct();
+
 		$this->objAttribute = $objAttribute;
-		$this->value = $strValue;
+		$this->value        = $strValue;
 	}
 
+	/**
+	 * Ensure the value is either a proper id or array od ids - converts aliases to ids.
+	 *
+	 * @return array
+	 */
 	public function sanitizeValue()
 	{
-		$strTableNameId = $this->objAttribute->get('tag_table');
-		$strColNameId = $this->objAttribute->get('tag_id');
+		$strTableNameId  = $this->objAttribute->get('tag_table');
+		$strColNameId    = $this->objAttribute->get('tag_id');
 		$strColNameAlias = $this->objAttribute->get('tag_alias');
 
 		$arrValues = is_array($this->value) ? $this->value : explode(',', $this->value);
@@ -60,9 +82,12 @@ class FilterRuleTags extends FilterRule
 				->execute($arrValues);
 
 			$arrValues = $objSelectIds->fetchEach($strColNameId);
-		} else {
+		}
+		else
+		{
 			$arrValues = array_map('intval', $arrValues);
 		}
+
 		return $arrValues;
 	}
 
@@ -79,10 +104,15 @@ class FilterRuleTags extends FilterRule
 			return array();
 		}
 
-		$objDB = \Database::getInstance();
-		$objMatches = $objDB
-			->prepare('SELECT item_id as id FROM tl_metamodel_tag_relation WHERE value_id IN (' . implode(',', $arrValues) . ') AND att_id = ?')
+		$objMatches = \Database::getInstance()
+			->prepare('
+				SELECT item_id as id
+				FROM tl_metamodel_tag_relation
+				WHERE value_id IN (' . implode(',', $arrValues) . ')
+				AND att_id = ?'
+			)
 			->execute($this->objAttribute->get('id'));
+
 		return $objMatches->fetchEach('id');
 	}
 }
