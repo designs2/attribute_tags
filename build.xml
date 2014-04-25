@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="MetaModels attribute tabletext" default="test">
+<project name="MetaModels attribute tags" default="test">
 	<target name="phpunit">
 		<exec dir="${basedir}" executable="vendor/bin/phpunit" failonerror="true" />
 	</target>

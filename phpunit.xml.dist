@@ -12,7 +12,7 @@
 		 bootstrap="tests/bootstrap.php"
 		>
 	<testsuites>
-		<testsuite name="MetaModels attribute tabletext tests">
+		<testsuite name="MetaModels attribute tags tests">
 			<directory>./tests/MetaModels/</directory>
 		</testsuite>
 	</testsuites>
@@ -25,7 +25,7 @@
 
 	<filter>
 		<whitelist>
-			<directory>./src/system/modules/metamodelsattribute_tabletext/MetaModels/</directory>
+			<directory>./src/system/modules/metamodelsattribute_tags/MetaModels/</directory>
 		</whitelist>
 	</filter>
 </phpunit>
