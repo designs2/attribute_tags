@@ -17,3 +17,6 @@
 
 $GLOBALS['METAMODELS']['attributes']['tags']['class'] = 'MetaModels\Attribute\Tags\Tags';
 $GLOBALS['METAMODELS']['attributes']['tags']['image'] = 'system/modules/metamodelsattribute_tags/html/tags.png';
+
+$GLOBALS['TL_EVENTS'][\ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent::NAME][] =
+	'MetaModels\DcGeneral\Events\Table\Attribute\Tags\PropertyAttribute::registerEvents';
