@@ -20,3 +20,10 @@
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']           = array('Display as checkbox wizard', 'Select this options to change the display type from "checkbox" to a "checkboxwizard".');
+
+/**
+ * Reference
+ */
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][0] = 'Display as checkbox menu';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][1] = 'Display as checkbox wizard';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][2] = 'Display as picker popup';

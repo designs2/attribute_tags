@@ -32,11 +32,13 @@ $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id'
 
 $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['fields']['tag_as_wizard'] = array
 (
-	'label'      => &$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard'],
-	'exclude'    => true,
-	'inputType'  => 'checkbox',
-	'eval'       => array
+	'label'       => &$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard'],
+	'exclude'     => true,
+	'inputType'   => 'select',
+	'options'     => array(0, 1, 2),
+	'reference'   => &$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'],
+	'eval'        => array
 	(
-		'tl_class'   => 'clr m12'
+		'tl_class' => 'clr'
 	)
 );

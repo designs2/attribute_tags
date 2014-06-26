@@ -33,6 +33,23 @@ use MetaModels\Filter\Rules\FilterRuleTags;
 class Tags extends BaseComplex
 {
 	/**
+	 * The widget mode to use.
+	 *
+	 * @var int
+	 */
+	protected $widgetMode;
+
+	/**
+	 * Determine if we want to use tree selection.
+	 *
+	 * @return bool
+	 */
+	protected function isTreePicker()
+	{
+		return $this->widgetMode == 2;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	protected function prepareTemplate(Template $objTemplate, $arrRowData, $objSettings = null)
@@ -52,7 +69,7 @@ class Tags extends BaseComplex
 	public function getAliasCol()
 	{
 		$strColNameAlias = $this->get('tag_alias');
-		if (!$strColNameAlias)
+		if ($this->isTreePicker() || !$strColNameAlias)
 		{
 			$strColNameAlias = $this->get('tag_id');
 		}
@@ -83,11 +100,17 @@ class Tags extends BaseComplex
 	 */
 	public function getFieldDefinition($arrOverrides = array())
 	{
-		// TODO: add tree support here.
-		$arrFieldDef = parent::getFieldDefinition($arrOverrides);
-
+		$arrFieldDef      = parent::getFieldDefinition($arrOverrides);
+		$this->widgetMode = $arrOverrides['tag_as_wizard'];
+		if ($this->isTreePicker())
+		{
+			$arrFieldDef['inputType']          = 'DcGeneralTreePicker';
+			$arrFieldDef['eval']['sourceName'] = $this->get('tag_table');
+			$arrFieldDef['eval']['sourceName'] = $this->get('tag_table');
+			$arrFieldDef['eval']['fieldType']  = 'checkbox';
+		}
 		// If tag as wizard is true, change the input type.
-		if ($arrOverrides['tag_as_wizard'] == true)
+		elseif ($this->widgetMode == 1)
 		{
 			$arrFieldDef['inputType'] = 'checkboxWizard';
 		}
