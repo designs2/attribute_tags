@@ -148,6 +148,12 @@ class Tags extends BaseComplex
 	 */
 	public function widgetToValue($varValue, $intId)
 	{
+		// If we are in tree mode, we got a comma separate list.
+		if ($this->isTreePicker() && !empty($varValue) && !is_array($varValue))
+		{
+			$varValue = explode(',', $varValue);
+		}
+
 		if ((!is_array($varValue)) || empty($varValue))
 		{
 			return array();
