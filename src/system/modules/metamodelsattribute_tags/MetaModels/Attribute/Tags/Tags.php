@@ -204,14 +204,14 @@ class Tags extends BaseComplex
 		$strColNameId    = $this->get('tag_id');
 		$strSortColumn   = $this->get('tag_sorting') ?: $strColNameId;
 		$strColNameWhere = ($this->get('tag_where') ? html_entity_decode($this->get('tag_where')) : false);
+		$objDB           = \Database::getInstance();
 
 		$arrReturn = array();
 
-		if ($strTableName && $strColNameId && $strSortColumn)
+		if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId && $strSortColumn)
 		{
 			$strColNameValue = $this->get('tag_column');
 			$strColNameAlias = $this->getAliasCol();
-			$objDB           = \Database::getInstance();
 
 			if ($arrIds)
 			{
@@ -324,11 +324,11 @@ class Tags extends BaseComplex
 	{
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
+		$objDB		  = \Database::getInstance();
 		$arrReturn    = array();
 
-		if ($strTableName && $strColNameId)
+		if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId)
 		{
-			$objDB                   = \Database::getInstance();
 			$strMetaModelTableName   = $this->getMetaModel()->getTableName();
 			$strMetaModelTableNameId = $strMetaModelTableName.'_id';
 
