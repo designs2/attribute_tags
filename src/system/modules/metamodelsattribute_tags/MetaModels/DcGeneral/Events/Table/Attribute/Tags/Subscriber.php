@@ -7,7 +7,7 @@
  *
  * PHP version 5
  * @package    MetaModels
- * @subpackage Core
+ * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
@@ -16,16 +16,19 @@
 
 namespace MetaModels\DcGeneral\Events\Table\Attribute\Tags;
 
+use ContaoCommunityAlliance\Contao\Bindings\ContaoEvents;
+use ContaoCommunityAlliance\Contao\Bindings\Events\Controller\ReplaceInsertTagsEvent;
 use ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\EncodePropertyValueFromWidgetEvent;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
 use MetaModels\DcGeneral\Events\BaseSubscriber;
-use MetaModels\Factory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Handle events for tl_metamodel_attribute.alias_fields.attr_id.
+ * Handle events for tl_metamodel_attribute for tag attributes.
  */
-class PropertyAttribute
+class Subscriber
 	extends BaseSubscriber
 {
 	/**
@@ -100,6 +103,14 @@ class PropertyAttribute
 			),
 			$dispatcher,
 			array('tl_metamodel_attribute', 'tag_sorting')
+		);
+
+		self::registerListeners(
+			array(
+				EncodePropertyValueFromWidgetEvent::NAME => __CLASS__ . '::ensureCustomQueryIsValid',
+			),
+			$dispatcher,
+			array('tl_metamodel_attribute', 'tag_where')
 		);
 	}
 
@@ -179,65 +190,58 @@ class PropertyAttribute
 	}
 
 	/**
+	 * Called by tl_metamodel_attribute.tag_where onsave_callback.
+	 *
 	 * Check if the select_where value is valid by firing a test query.
 	 *
-	 * @param string                 $varValue The where condition to test.
+	 * @param EncodePropertyValueFromWidgetEvent $event The event.
 	 *
-	 * @param DataContainerInterface $objDC    The data container.
+	 * @return void
 	 *
-	 * @return array
-	 *
-	 * @ToDo: Have to refine for the save event.
+	 * @throws \RuntimeException When no table name has been given.
 	 */
-	public function checkQuery($varValue, DataContainerInterface $objDC)
+	public static function ensureCustomQueryIsValid(EncodePropertyValueFromWidgetEvent $event)
 	{
-		$objModel = $objDC->getEnvironment()->getCurrentModel();
+		$model = $event->getModel();
+		$value = $event->getValue();
 
-		if ($objModel && $varValue)
+		if ($model && $value)
 		{
-			$objDB = \Database::getInstance();
+			$db = \Database::getInstance();
 
-			$strTableName  = $objModel->getProperty('tag_table');
-			$strColNameId  = $objModel->getProperty('tag_id');
-			$strSortColumn = $objModel->getProperty('tag_sorting') ?: $strColNameId;
+			$tableName    = $model->getProperty('tag_table');
+			$colNameId    = $model->getProperty('tag_id');
+			$sortColumn   = $model->getProperty('tag_sorting') ?: $colNameId;
+			$colNameWhere = $value;
 
-			$strColNameWhere = $varValue;
-
-			$strQuery = sprintf('
+			$query = sprintf('
 				SELECT %1$s.*
 				FROM %1$s%2$s
 				ORDER BY %1$s.%3$s',
 				// @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-				$strTableName,                                                // 1
-				($strColNameWhere ? ' WHERE ('.$strColNameWhere.')' : false), // 2
-				$strSortColumn                                                // 3
+				$tableName,                                                // 1
+				($colNameWhere ? ' WHERE ('.$colNameWhere.')' : false), // 2
+				$sortColumn                                                // 3
 			// @codingStandardsIgnoreEnd
 			);
 
-			// Replace inserttags but do not cache.
-			// FIXME: remove dependency on deprecated ContaoController.
-			$strQuery = ContaoController::getInstance()->replaceInsertTags($strQuery, false);
+			// Replace insert tags but do not cache.
+			/** @var EventDispatcherInterface $dispatcher */
+			$dispatcher = $GLOBALS['container']['event-dispatcher'];
+			$event      = new ReplaceInsertTagsEvent($query, false);
+			$dispatcher->dispatch(ContaoEvents::CONTROLLER_REPLACE_INSERT_TAGS, $event);
+			$query = $event->getBuffer();
 
 			try
 			{
-				$objDB
-					->prepare($strQuery)
+				$db
+					->prepare($query)
 					->execute();
 			}
 			catch(\Exception $e)
 			{
-				// FIXME: These methods are not available anymore.
-				// Add error.
-				$objDC->addError($GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']);
-
-				// Log error.
-				$this->log($e->getMessage(), 'TableMetaModelsAttributeTags checkQuery()', TL_ERROR);
-
-				// Keep the current value.
-				return $objModel->getProperty('tag_where');
+				throw new \RuntimeException($GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']);
 			}
 		}
-
-		return $varValue;
 	}
 }
