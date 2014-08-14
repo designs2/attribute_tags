@@ -21,6 +21,7 @@ namespace MetaModels\Attribute\Tags;
 use MetaModels\Attribute\BaseComplex;
 use MetaModels\Render\Template;
 use MetaModels\Filter\Rules\FilterRuleTags;
+use \Contao\Database\Result;
 
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
@@ -324,7 +325,7 @@ class Tags extends BaseComplex
 	{
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
-		$objDB		  = \Database::getInstance();
+		$objDB        = \Database::getInstance();
 		$arrReturn    = array();
 
 		if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId)
@@ -365,112 +366,135 @@ class Tags extends BaseComplex
 	}
 
 	/**
+	 * Update the tag ids for a given item.
+	 *
+	 * @param int    $itemId         The item for which data shall be set for.
+	 *
+	 * @param array  $tags           The tag ids that shall be set for the item.
+	 *
+	 * @param Result $existingTagIds The sql result containing the tag ids present in the database.
+	 *
+	 * @return array
+	 */
+	protected function setDataForItem($itemId, $tags, $existingTagIds)
+	{
+		$objDB = \Database::getInstance();
+
+		if ($tags === null)
+		{
+			$tagIds = array();
+		} else {
+			$tagIds = array_map('intval', array_keys($tags));
+		}
+		$thisExisting = array();
+
+		// Determine existing tags for this item.
+		if (($existingTagIds->item_id == $itemId))
+		{
+			$thisExisting[] = $existingTagIds->value_id;
+		}
+		while ($existingTagIds->next() && ($existingTagIds->item_id == $itemId))
+		{
+			$thisExisting[] = $existingTagIds->value_id;
+		}
+
+		// First pass, delete all not mentioned anymore.
+		$valuesToRemove = array_diff($thisExisting, $tagIds);
+		if ($valuesToRemove)
+		{
+			$objDB
+				->prepare(sprintf('
+					DELETE FROM tl_metamodel_tag_relation
+					WHERE
+					att_id=?
+					AND item_id=?
+					AND value_id IN (%s)',
+					implode(',', $valuesToRemove)
+				))
+				->execute($this->get('id'), $itemId);
+		}
+
+		// Second pass, add all new values in a row.
+		$valuesToAdd  = array_diff($tagIds, $thisExisting);
+		$insertValues = array();
+		if ($valuesToAdd)
+		{
+			foreach ($valuesToAdd as $valueId)
+			{
+				$insertValues[] = sprintf(
+					'(%s,%s,%s,%s)',
+					$this->get('id'),
+					$itemId,
+					(int)$tags[$valueId]['tag_value_sorting'],
+					$valueId
+				);
+			}
+		}
+
+		// Third pass, update all sorting values.
+		$valuesToUpdate = array_diff($tagIds, $valuesToAdd);
+		if ($valuesToUpdate)
+		{
+			foreach ($valuesToUpdate as $valueId)
+			{
+				if (!array_key_exists('tag_value_sorting', $tags[$valueId]))
+				{
+					continue;
+				}
+
+				$objDB->prepare('
+						UPDATE tl_metamodel_tag_relation
+						SET value_sorting = ' . (int)$tags[$valueId]['tag_value_sorting'] . '
+						WHERE
+						att_id=?
+						AND item_id=?
+						AND value_id=?')
+					->execute($this->get('id'), $itemId, $valueId);
+			}
+		}
+
+		return $insertValues;
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function setDataFor($arrValues)
 	{
-		$objDB      = \Database::getInstance();
-		$arrItemIds = array_map('intval', array_keys($arrValues));
-		sort($arrItemIds);
+		$db      = \Database::getInstance();
+		$itemIds = array_map('intval', array_keys($arrValues));
+		sort($itemIds);
 		// Load all existing tags for all items to be updated, keep the ordering to item Id
 		// so we can benefit from the batch deletion and insert algorithm.
-		$objExistingTagIds = $objDB
+		$existingTagIds = $db
 			->prepare(sprintf('
 				SELECT * FROM tl_metamodel_tag_relation
 				WHERE
 				att_id=?
 				AND item_id IN (%1$s)
 				ORDER BY item_id ASC',
-				implode(',', $arrItemIds)
+				implode(',', $itemIds)
 			))
 			->execute($this->get('id'));
 
 		// Now loop over all items and update the values for them.
 		// NOTE: we can not loop over the original array, as the item ids are not neccessarily
 		// sorted ascending by item id.
-		$arrSQLInsertValues = array();
-		foreach ($arrItemIds as $intItemId)
+		$insertValues = array();
+		foreach ($itemIds as $itemId)
 		{
-			$arrTags = $arrValues[$intItemId];
-			if ($arrTags === null)
-			{
-				$arrTagIds = array();
-			} else {
-				$arrTagIds = array_map('intval', array_keys($arrTags));
-			}
-			$arrThisExisting = array();
-
-			// Determine existing tags for this item.
-			if (($objExistingTagIds->item_id == $intItemId))
-			{
-				$arrThisExisting[] = $objExistingTagIds->value_id;
-			}
-			while ($objExistingTagIds->next() && ($objExistingTagIds->item_id == $intItemId))
-			{
-				$arrThisExisting[] = $objExistingTagIds->value_id;
-			}
-
-			// First pass, delete all not mentioned anymore.
-			$arrValuesToRemove = array_diff($arrThisExisting, $arrTagIds);
-			if ($arrValuesToRemove)
-			{
-				$objDB
-					->prepare(sprintf('
-					DELETE FROM tl_metamodel_tag_relation
-					WHERE
-					att_id=?
-					AND item_id=?
-					AND value_id IN (%s)',
-					implode(',', $arrValuesToRemove)
-					))
-					->execute($this->get('id'), $intItemId);
-			}
-
-			// Second pass, add all new values in a row.
-			$arrValuesToAdd = array_diff($arrTagIds, $arrThisExisting);
-			if ($arrValuesToAdd)
-			{
-				foreach ($arrValuesToAdd as $intValueId)
-				{
-					$arrSQLInsertValues[] = sprintf(
-						'(%s,%s,%s,%s)',
-						$this->get('id'),
-						$intItemId,
-						(int)$arrTags[$intValueId]['tag_value_sorting'],
-						$intValueId
-					);
-				}
-			}
-
-			// Third pass, update all sorting values.
-			$arrValuesToUpdate = array_diff($arrTagIds, $arrValuesToAdd);
-			if ($arrValuesToUpdate)
-			{
-				foreach ($arrValuesToUpdate as $intValueId)
-				{
-					if (!array_key_exists('tag_value_sorting', $arrTags[$intValueId]))
-					{
-						continue;
-					}
-
-					$objDB->prepare('
-						UPDATE tl_metamodel_tag_relation
-						SET value_sorting = ' . (int)$arrTags[$intValueId]['tag_value_sorting'] . '
-						WHERE
-						att_id=?
-						AND item_id=?
-						AND value_id=?')
-						->execute($this->get('id'), $intItemId, $intValueId);
-				}
-			}
+			$insertValues = array_merge(
+				$insertValues,
+				$this->setDataForItem($itemId, $arrValues[$itemId], $existingTagIds)
+			);
 		}
 
-		if ($arrSQLInsertValues)
+		if ($insertValues)
 		{
-			$objDB->execute('
+			$db->execute('
 			INSERT INTO tl_metamodel_tag_relation
 			(att_id, item_id, value_sorting, value_id)
-			VALUES ' . implode(',', $arrSQLInsertValues)
+			VALUES ' . implode(',', $insertValues)
 			);
 		}
 	}
