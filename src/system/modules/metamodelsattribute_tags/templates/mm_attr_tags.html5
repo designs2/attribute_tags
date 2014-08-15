@@ -1,5 +1,5 @@
 <?php if (count($this->raw) > 0): ?>
-<ul>
+<ul class="tags<?php echo $this->additional_class; ?>">
 <?php $i=0; $last=count($this->tags)-1; 
 foreach ($this->raw as $arrTag):
 	$arrClass = array();
