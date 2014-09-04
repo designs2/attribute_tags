@@ -203,7 +203,7 @@ class Subscriber
 	public static function ensureCustomQueryIsValid(EncodePropertyValueFromWidgetEvent $event)
 	{
 		$values = $event->getPropertyValueBag();
-		$value = $event->getValue();
+		$value  = $event->getValue();
 
 		if ($value)
 		{
