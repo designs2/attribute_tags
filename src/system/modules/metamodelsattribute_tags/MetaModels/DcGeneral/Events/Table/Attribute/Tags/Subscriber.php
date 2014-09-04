@@ -202,16 +202,16 @@ class Subscriber
 	 */
 	public static function ensureCustomQueryIsValid(EncodePropertyValueFromWidgetEvent $event)
 	{
-		$model = $event->getModel();
+		$values = $event->getPropertyValueBag();
 		$value = $event->getValue();
 
-		if ($model && $value)
+		if ($value)
 		{
 			$db = \Database::getInstance();
 
-			$tableName    = $model->getProperty('tag_table');
-			$colNameId    = $model->getProperty('tag_id');
-			$sortColumn   = $model->getProperty('tag_sorting') ?: $colNameId;
+			$tableName    = $values->getPropertyValue('tag_table');
+			$colNameId    = $values->getPropertyValue('tag_id');
+			$sortColumn   = $values->getPropertyValue('tag_sorting') ?: $colNameId;
 			$colNameWhere = $value;
 
 			$query = sprintf('
@@ -220,7 +220,7 @@ class Subscriber
 				ORDER BY %1$s.%3$s',
 				// @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
 				$tableName,                                                // 1
-				($colNameWhere ? ' WHERE ('.$colNameWhere.')' : false), // 2
+				($colNameWhere ? ' WHERE ('.$colNameWhere.')' : false),    // 2
 				$sortColumn                                                // 3
 			// @codingStandardsIgnoreEnd
 			);
