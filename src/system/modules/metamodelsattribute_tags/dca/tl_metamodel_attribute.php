@@ -17,98 +17,98 @@
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tags extends _simpleattribute_'] = array
 (
-	'+display' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias', 'tag_sorting', 'tag_where')
+    '+display' => array('tag_table after description', 'tag_column', 'tag_id', 'tag_alias', 'tag_sorting', 'tag_where')
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_table'] = array
 (
-	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table'],
-	'exclude'                => true,
-	'inputType'              => 'select',
-	'eval'                   => array
-	(
-		'includeBlankOption' => true,
-		'doNotSaveEmpty'     => true,
-		'alwaysSave'         => true,
-		'submitOnChange'     => true,
-		'tl_class'           => 'w50',
-		'chosen'             => 'true'
-	),
+    'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table'],
+    'exclude'                => true,
+    'inputType'              => 'select',
+    'eval'                   => array
+    (
+        'includeBlankOption' => true,
+        'doNotSaveEmpty'     => true,
+        'alwaysSave'         => true,
+        'submitOnChange'     => true,
+        'tl_class'           => 'w50',
+        'chosen'             => 'true'
+    ),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_column'] = array
 (
-	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column'],
-	'exclude'                => true,
-	'inputType'              => 'select',
-	'eval'                   => array
-	(
-		'includeBlankOption' => true,
-		'doNotSaveEmpty'     => true,
-		'alwaysSave'         => true,
-		'submitOnChange'     => true,
-		'tl_class'           => 'w50',
-		'chosen'             => 'true'
-	),
+    'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column'],
+    'exclude'                => true,
+    'inputType'              => 'select',
+    'eval'                   => array
+    (
+        'includeBlankOption' => true,
+        'doNotSaveEmpty'     => true,
+        'alwaysSave'         => true,
+        'submitOnChange'     => true,
+        'tl_class'           => 'w50',
+        'chosen'             => 'true'
+    ),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_id'] = array
 (
-	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id'],
-	'exclude'                => true,
-	'inputType'              => 'select',
-	'eval'                   => array
-	(
-		'includeBlankOption' => true,
-		'doNotSaveEmpty'     => true,
-		'alwaysSave'         => true,
-		'submitOnChange'     => true,
-		'tl_class'           => 'w50',
-		'chosen'             => 'true'
-	),
+    'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id'],
+    'exclude'                => true,
+    'inputType'              => 'select',
+    'eval'                   => array
+    (
+        'includeBlankOption' => true,
+        'doNotSaveEmpty'     => true,
+        'alwaysSave'         => true,
+        'submitOnChange'     => true,
+        'tl_class'           => 'w50',
+        'chosen'             => 'true'
+    ),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_alias'] = array
 (
-	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias'],
-	'exclude'                => true,
-	'inputType'              => 'select',
-	'eval'                   => array
-	(
-		'includeBlankOption' => true,
-		'doNotSaveEmpty'     => true,
-		'alwaysSave'         => true,
-		'submitOnChange'     => true,
-		'tl_class'           => 'w50',
-		'chosen'             => 'true'
-	),
+    'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias'],
+    'exclude'                => true,
+    'inputType'              => 'select',
+    'eval'                   => array
+    (
+        'includeBlankOption' => true,
+        'doNotSaveEmpty'     => true,
+        'alwaysSave'         => true,
+        'submitOnChange'     => true,
+        'tl_class'           => 'w50',
+        'chosen'             => 'true'
+    ),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_sorting'] = array
 (
-	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting'],
-	'exclude'                => true,
-	'inputType'              => 'select',
-	'eval'                   => array
-	(
-		'includeBlankOption' => true,
-		'doNotSaveEmpty'     => true,
-		'alwaysSave'         => true,
-		'submitOnChange'     => true,
-		'tl_class'           => 'w50',
-		'chosen'             => 'true'
-	),
+    'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting'],
+    'exclude'                => true,
+    'inputType'              => 'select',
+    'eval'                   => array
+    (
+        'includeBlankOption' => true,
+        'doNotSaveEmpty'     => true,
+        'alwaysSave'         => true,
+        'submitOnChange'     => true,
+        'tl_class'           => 'w50',
+        'chosen'             => 'true'
+    ),
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_where'] = array
 (
-	'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where'],
-	'exclude'                => true,
-	'inputType'              => 'textarea',
-	'eval'                   => array
-	(
-		'tl_class'           => 'clr',
-		'style'              => 'height: 4em;',
-		'decodeEntities'     => 'true'
-	)
+    'label'                  => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where'],
+    'exclude'                => true,
+    'inputType'              => 'textarea',
+    'eval'                   => array
+    (
+        'tl_class'           => 'clr',
+        'style'              => 'height: 4em;',
+        'decodeEntities'     => 'true'
+    )
 );
