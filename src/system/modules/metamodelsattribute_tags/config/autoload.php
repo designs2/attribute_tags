@@ -6,12 +6,12 @@
  * data in each collection.
  *
  * PHP version 5
- * @package    MetaModels
- * @subpackage AttributeTags
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author     Andreas Isaak <info@andreas-isaak.de>
- * @copyright  The MetaModels team.
- * @license    LGPL.
+ *
+ * @package   AttributeTags
+ * @author    Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author    Andreas Isaak <info@andreas-isaak.de>
+ * @copyright The MetaModels team.
+ * @license   LGPL.
  * @filesource
  */
 

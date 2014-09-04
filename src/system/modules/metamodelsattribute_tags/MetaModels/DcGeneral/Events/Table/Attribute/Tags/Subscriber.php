@@ -6,8 +6,8 @@
  * data in each collection.
  *
  * PHP version 5
- * @package    MetaModels
- * @subpackage AttributeTags
+ *
+ * @package    AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
@@ -27,6 +27,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Handle events for tl_metamodel_attribute for tag attributes.
+ *
+ * @package AttributeTags
+ * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
 class Subscriber
 	extends BaseSubscriber

@@ -6,6 +6,7 @@
  * data in each collection.
  *
  * PHP version 5
+ *
  * @package    MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
@@ -22,9 +23,8 @@ use MetaModels\Filter\FilterRule;
 /**
  * This is the MetaModelFilterRule class for handling select fields.
  *
- * @package	   MetaModels
- * @subpackage AttributeTags
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @package AttributeTags
+ * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
 class FilterRuleTags extends FilterRule
 {
