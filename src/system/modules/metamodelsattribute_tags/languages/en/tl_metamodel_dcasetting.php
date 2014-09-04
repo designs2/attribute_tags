@@ -15,8 +15,10 @@
  * @filesource
  */
 
-// Fields,
-$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']           = array('Display as checkbox wizard', 'Select this options to change the display type from "checkbox" to a "checkboxwizard".');
+// Fields.
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard'][0] = 'Display as checkbox wizard';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard'][1] =
+    'Select this options to change the display type from "checkbox" to a "checkboxwizard".';
 
 // Reference.
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][0] = 'Display as checkbox menu';
