@@ -25,12 +25,13 @@ use \Contao\Database\Result;
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
  *
- * @package AttributeTags
- * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @package    AttributeTags
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Christian de la Haye <service@delahaye.de>
  */
 class Tags extends BaseComplex
 {
+
     /**
      * The widget mode to use.
      *
@@ -68,8 +69,7 @@ class Tags extends BaseComplex
     public function getAliasCol()
     {
         $strColNameAlias = $this->get('tag_alias');
-        if ($this->isTreePicker() || !$strColNameAlias)
-        {
+        if ($this->isTreePicker() || !$strColNameAlias) {
             $strColNameAlias = $this->get('tag_id');
         }
         return $strColNameAlias;
@@ -80,18 +80,21 @@ class Tags extends BaseComplex
      */
     public function getAttributeSettingNames()
     {
-        return array_merge(parent::getAttributeSettingNames(), array(
-            'tag_table',
-            'tag_column',
-            'tag_id',
-            'tag_alias',
-            'tag_where',
-            'tag_sorting',
-            'tag_as_wizard',
-            'mandatory',
-            'filterable',
-            'searchable',
-        ));
+        return array_merge(
+            parent::getAttributeSettingNames(),
+            array(
+                'tag_table',
+                'tag_column',
+                'tag_id',
+                'tag_alias',
+                'tag_where',
+                'tag_sorting',
+                'tag_as_wizard',
+                'mandatory',
+                'filterable',
+                'searchable',
+            )
+        );
     }
 
     /**
@@ -101,20 +104,15 @@ class Tags extends BaseComplex
     {
         $arrFieldDef      = parent::getFieldDefinition($arrOverrides);
         $this->widgetMode = $arrOverrides['tag_as_wizard'];
-        if ($this->isTreePicker())
-        {
+        if ($this->isTreePicker()) {
             $arrFieldDef['inputType']          = 'DcGeneralTreePicker';
             $arrFieldDef['eval']['sourceName'] = $this->get('tag_table');
             $arrFieldDef['eval']['sourceName'] = $this->get('tag_table');
             $arrFieldDef['eval']['fieldType']  = 'checkbox';
-        }
-        // If tag as wizard is true, change the input type.
-        elseif ($this->widgetMode == 1)
-        {
+        } elseif ($this->widgetMode == 1) {
+            // If tag as wizard is true, change the input type.
             $arrFieldDef['inputType'] = 'checkboxWizard';
-        }
-        else
-        {
+        } else {
             $arrFieldDef['inputType'] = 'checkbox';
         }
 
@@ -132,10 +130,8 @@ class Tags extends BaseComplex
         $strColNameAlias = $this->getAliasCol();
 
         $arrResult = array();
-        if ($varValue)
-        {
-            foreach ($varValue as $arrValue)
-            {
+        if ($varValue) {
+            foreach ($varValue as $arrValue) {
                 $arrResult[] = $arrValue[$strColNameAlias];
             }
         }
@@ -145,43 +141,42 @@ class Tags extends BaseComplex
     /**
      * {@inheritdoc}
      */
+    // @codingStandardsIgnoreStart - ignore unused parameter $intId.
     public function widgetToValue($varValue, $intId)
     {
         // If we are in tree mode, we got a comma separate list.
-        if ($this->isTreePicker() && !empty($varValue) && !is_array($varValue))
-        {
+        if ($this->isTreePicker() && !empty($varValue) && !is_array($varValue)) {
             $varValue = explode(',', $varValue);
         }
 
-        if ((!is_array($varValue)) || empty($varValue))
-        {
+        if ((!is_array($varValue)) || empty($varValue)) {
             return array();
         }
 
         $arrSearch = array();
         $arrParams = array();
-        foreach ($varValue as $strValue)
-        {
+        foreach ($varValue as $strValue) {
             $arrSearch[] = '?';
             $arrParams[] = $strValue;
         }
         $objDB    = \Database::getInstance();
         $objValue = $objDB
-            ->prepare(sprintf('
-                SELECT %1$s.*
-                FROM %1$s
-                WHERE %2$s IN (%3$s)',
-                $this->get('tag_table'),
-                $this->getAliasCol(),
-                implode(',', $arrSearch)
-            ))
+            ->prepare(
+                sprintf('
+                    SELECT %1$s.*
+                    FROM %1$s
+                    WHERE %2$s IN (%3$s)',
+                    $this->get('tag_table'),
+                    $this->getAliasCol(),
+                    implode(',', $arrSearch)
+                )
+            )
             ->execute($arrParams);
 
         $strColNameId = $this->get('tag_id');
         $arrResult    = array();
 
-        while ($objValue->next())
-        {
+        while ($objValue->next()) {
             // Adding the sorting from widget.
             $strAlias                                                 = $this->getAliasCol();
             $arrResult[$objValue->$strColNameId]                      = $objValue->row();
@@ -190,6 +185,7 @@ class Tags extends BaseComplex
 
         return $arrResult;
     }
+    // @codingStandardsIgnoreEnd
 
     /**
      * {@inheritdoc}
@@ -207,15 +203,12 @@ class Tags extends BaseComplex
 
         $arrReturn = array();
 
-        if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId && $strSortColumn)
-        {
+        if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId && $strSortColumn) {
             $strColNameValue = $this->get('tag_column');
             $strColNameAlias = $this->getAliasCol();
 
-            if ($arrIds)
-            {
-                if ($usedOnly)
-                {
+            if ($arrIds) {
+                if ($usedOnly) {
                     $strSQL = '
                         SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
                         FROM %1$s
@@ -239,22 +232,20 @@ class Tags extends BaseComplex
                         ORDER BY %1$s.%4$s';
                 }
 
-                $objValue = $objDB->prepare(sprintf(
-                    $strSQL,
-                    // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                    $strTableName,                                          // 1
-                    $strColNameId,                                          // 2
-                    implode(',', $arrIds),                                  // 3
-                    $strSortColumn,                                         // 4
-                    ($strColNameWhere ? ' AND ('.$strColNameWhere.')' : '') // 5
+                $objValue = $objDB->prepare(
+                    sprintf(
+                        $strSQL,
+                        // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+                        $strTableName,                                              // 1
+                        $strColNameId,                                              // 2
+                        implode(',', $arrIds),                                      // 3
+                        $strSortColumn,                                             // 4
+                        ($strColNameWhere ? ' AND (' . $strColNameWhere . ')' : '') // 5
                     // @codingStandardsIgnoreEnd
-                ))->execute($this->get('id'));
-
-            }
-            else
-            {
-                if ($usedOnly)
-                {
+                    )
+                )->execute($this->get('id'));
+            } else {
+                if ($usedOnly) {
                     $strSQL = '
                         SELECT COUNT(%1$s.%3$s) as mm_count, %1$s.*
                         FROM %1$s
@@ -266,9 +257,7 @@ class Tags extends BaseComplex
                         . ($strColNameWhere ? ' AND %5$s' : '') . '
                         GROUP BY %1$s.%3$s
                         ORDER BY %1$s.%2$s';
-                }
-                else
-                {
+                } else {
                     $strSQL = '
                         SELECT COUNT(rel.value_id) as mm_count, %1$s.*
                         FROM %1$s
@@ -281,22 +270,22 @@ class Tags extends BaseComplex
                         ORDER BY %1$s.%2$s';
                 }
 
-                $objValue = $objDB->prepare(sprintf(
-                    $strSQL,
-                    // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                    $strTableName,    // 1
-                    $strSortColumn,   // 2
-                    $strColNameId,    // 3
-                    $this->get('id'), // 4
-                    $strColNameWhere  // 5
+                $objValue = $objDB->prepare(
+                    sprintf(
+                        $strSQL,
+                        // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+                        $strTableName,    // 1
+                        $strSortColumn,   // 2
+                        $strColNameId,    // 3
+                        $this->get('id'), // 4
+                        $strColNameWhere  // 5
                     // @codingStandardsIgnoreEnd
-                ))->execute();
+                    )
+                )->execute();
             }
 
-            while ($objValue->next())
-            {
-                if (is_array($arrCount))
-                {
+            while ($objValue->next()) {
+                if (is_array($arrCount)) {
                     $arrCount[$objValue->$strColNameAlias] = $objValue->mm_count;
                 }
 
@@ -326,33 +315,33 @@ class Tags extends BaseComplex
         $objDB        = \Database::getInstance();
         $arrReturn    = array();
 
-        if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId)
-        {
+        if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId) {
             $strMetaModelTableName   = $this->getMetaModel()->getTableName();
-            $strMetaModelTableNameId = $strMetaModelTableName.'_id';
+            $strMetaModelTableNameId = $strMetaModelTableName . '_id';
 
-            $objValue = $objDB->prepare(sprintf('
-                SELECT %1$s.*, tl_metamodel_tag_relation.item_id AS %2$s
-                FROM %1$s
-                LEFT JOIN tl_metamodel_tag_relation ON (
-                    (tl_metamodel_tag_relation.att_id=?)
-                    AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
+            $objValue = $objDB
+                ->prepare(
+                    sprintf(
+                        'SELECT %1$s.*, tl_metamodel_tag_relation.item_id AS %2$s
+                        FROM %1$s
+                        LEFT JOIN tl_metamodel_tag_relation ON (
+                            (tl_metamodel_tag_relation.att_id=?)
+                            AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
+                        )
+                        WHERE tl_metamodel_tag_relation.item_id IN (%4$s)
+                        ORDER BY tl_metamodel_tag_relation.value_sorting',
+                        // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+                        $strTableName,            // 1
+                        $strMetaModelTableNameId, // 2
+                        $strColNameId,            // 3
+                        implode(',', $arrIds)     // 4
+                    // @codingStandardsIgnoreEnd
+                    )
                 )
-                WHERE tl_metamodel_tag_relation.item_id IN (%4$s)
-                ORDER BY tl_metamodel_tag_relation.value_sorting',
-                // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                $strTableName,            // 1
-                $strMetaModelTableNameId, // 2
-                $strColNameId,            // 3
-                implode(',', $arrIds)     // 4
-                // @codingStandardsIgnoreEnd
-            ))
                 ->execute($this->get('id'));
 
-            while ($objValue->next())
-            {
-                if (!$arrReturn[$objValue->$strMetaModelTableNameId])
-                {
+            while ($objValue->next()) {
+                if (!$arrReturn[$objValue->$strMetaModelTableNameId]) {
                     $arrReturn[$objValue->$strMetaModelTableNameId] = array();
                 }
                 $arrData = $objValue->row();
@@ -378,8 +367,7 @@ class Tags extends BaseComplex
     {
         $objDB = \Database::getInstance();
 
-        if ($tags === null)
-        {
+        if ($tags === null) {
             $tagIds = array();
         } else {
             $tagIds = array_map('intval', array_keys($tags));
@@ -387,38 +375,35 @@ class Tags extends BaseComplex
         $thisExisting = array();
 
         // Determine existing tags for this item.
-        if (($existingTagIds->item_id == $itemId))
-        {
+        if (($existingTagIds->item_id == $itemId)) {
             $thisExisting[] = $existingTagIds->value_id;
         }
-        while ($existingTagIds->next() && ($existingTagIds->item_id == $itemId))
-        {
+        while ($existingTagIds->next() && ($existingTagIds->item_id == $itemId)) {
             $thisExisting[] = $existingTagIds->value_id;
         }
 
         // First pass, delete all not mentioned anymore.
         $valuesToRemove = array_diff($thisExisting, $tagIds);
-        if ($valuesToRemove)
-        {
+        if ($valuesToRemove) {
             $objDB
-                ->prepare(sprintf('
-                    DELETE FROM tl_metamodel_tag_relation
-                    WHERE
-                    att_id=?
-                    AND item_id=?
-                    AND value_id IN (%s)',
-                    implode(',', $valuesToRemove)
-                ))
+                ->prepare(
+                    sprintf(
+                        'DELETE FROM tl_metamodel_tag_relation
+                        WHERE
+                        att_id=?
+                        AND item_id=?
+                        AND value_id IN (%s)',
+                        implode(',', $valuesToRemove)
+                    )
+                )
                 ->execute($this->get('id'), $itemId);
         }
 
         // Second pass, add all new values in a row.
         $valuesToAdd  = array_diff($tagIds, $thisExisting);
         $insertValues = array();
-        if ($valuesToAdd)
-        {
-            foreach ($valuesToAdd as $valueId)
-            {
+        if ($valuesToAdd) {
+            foreach ($valuesToAdd as $valueId) {
                 $insertValues[] = sprintf(
                     '(%s,%s,%s,%s)',
                     $this->get('id'),
@@ -431,22 +416,21 @@ class Tags extends BaseComplex
 
         // Third pass, update all sorting values.
         $valuesToUpdate = array_diff($tagIds, $valuesToAdd);
-        if ($valuesToUpdate)
-        {
-            foreach ($valuesToUpdate as $valueId)
-            {
-                if (!array_key_exists('tag_value_sorting', $tags[$valueId]))
-                {
+        if ($valuesToUpdate) {
+            foreach ($valuesToUpdate as $valueId) {
+                if (!array_key_exists('tag_value_sorting', $tags[$valueId])) {
                     continue;
                 }
 
-                $objDB->prepare('
-                        UPDATE tl_metamodel_tag_relation
+                $objDB
+                    ->prepare(
+                        'UPDATE tl_metamodel_tag_relation
                         SET value_sorting = ' . (int)$tags[$valueId]['tag_value_sorting'] . '
                         WHERE
                         att_id=?
                         AND item_id=?
-                        AND value_id=?')
+                        AND value_id=?'
+                    )
                     ->execute($this->get('id'), $itemId, $valueId);
             }
         }
@@ -465,34 +449,34 @@ class Tags extends BaseComplex
         // Load all existing tags for all items to be updated, keep the ordering to item Id
         // so we can benefit from the batch deletion and insert algorithm.
         $existingTagIds = $db
-            ->prepare(sprintf('
-                SELECT * FROM tl_metamodel_tag_relation
-                WHERE
-                att_id=?
-                AND item_id IN (%1$s)
-                ORDER BY item_id ASC',
-                implode(',', $itemIds)
-            ))
+            ->prepare(
+                sprintf(
+                    'SELECT * FROM tl_metamodel_tag_relation
+                    WHERE
+                    att_id=?
+                    AND item_id IN (%1$s)
+                    ORDER BY item_id ASC',
+                    implode(',', $itemIds)
+                )
+            )
             ->execute($this->get('id'));
 
         // Now loop over all items and update the values for them.
         // NOTE: we can not loop over the original array, as the item ids are not neccessarily
         // sorted ascending by item id.
         $insertValues = array();
-        foreach ($itemIds as $itemId)
-        {
+        foreach ($itemIds as $itemId) {
             $insertValues = array_merge(
                 $insertValues,
                 $this->setDataForItem($itemId, $arrValues[$itemId], $existingTagIds)
             );
         }
 
-        if ($insertValues)
-        {
-            $db->execute('
-            INSERT INTO tl_metamodel_tag_relation
-            (att_id, item_id, value_sorting, value_id)
-            VALUES ' . implode(',', $insertValues)
+        if ($insertValues) {
+            $db->execute(
+                'INSERT INTO tl_metamodel_tag_relation
+                (att_id, item_id, value_sorting, value_id)
+                VALUES ' . implode(',', $insertValues)
             );
         }
     }
@@ -504,22 +488,23 @@ class Tags extends BaseComplex
      */
     public function unsetDataFor($arrIds)
     {
-        if ($arrIds)
-        {
-            if (!is_array($arrIds))
-            {
+        if ($arrIds) {
+            if (!is_array($arrIds)) {
                 throw new \RuntimeException(
                     'MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.',
                     1
                 );
             }
             $objDB = \Database::getInstance();
-            $objDB->prepare(sprintf('
-                DELETE FROM tl_metamodel_tag_relation
-                WHERE
-                att_id=?
-                AND item_id IN (%s)',
-                implode(',', $arrIds)))->execute($this->get('id'));
+            $objDB->prepare(
+                sprintf(
+                    'DELETE FROM tl_metamodel_tag_relation
+                    WHERE
+                    att_id=?
+                    AND item_id IN (%s)',
+                    implode(',', $arrIds)
+                )
+            )->execute($this->get('id'));
         }
     }
 }

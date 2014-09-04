@@ -68,11 +68,11 @@ class FilterRuleTags extends FilterRule
 
         $objDB = \Database::getInstance();
 
-        if ($strColNameAlias)
-        {
+        if ($strColNameAlias) {
             $objSelectIds = $objDB
                 ->prepare(
-                    sprintf('SELECT %1$s FROM %2$s WHERE %3$s IN (%4$s)',
+                    sprintf(
+                        'SELECT %1$s FROM %2$s WHERE %3$s IN (%4$s)',
                         $strColNameId,
                         $strTableNameId,
                         $strColNameAlias,
@@ -82,9 +82,7 @@ class FilterRuleTags extends FilterRule
                 ->execute($arrValues);
 
             $arrValues = $objSelectIds->fetchEach($strColNameId);
-        }
-        else
-        {
+        } else {
             $arrValues = array_map('intval', $arrValues);
         }
 
@@ -99,14 +97,13 @@ class FilterRuleTags extends FilterRule
         $arrValues = $this->sanitizeValue();
 
         // Get out when no values are available.
-        if (!$arrValues)
-        {
+        if (!$arrValues) {
             return array();
         }
 
         $objMatches = \Database::getInstance()
-            ->prepare('
-                SELECT item_id as id
+            ->prepare(
+                'SELECT item_id as id
                 FROM tl_metamodel_tag_relation
                 WHERE value_id IN (' . implode(',', $arrValues) . ')
                 AND att_id = ?'

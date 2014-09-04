@@ -31,8 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @package AttributeTags
  * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
-class Subscriber
-    extends BaseSubscriber
+class Subscriber extends BaseSubscriber
 {
     /**
      * Register all listeners to handle creation of a data container.
@@ -61,8 +60,7 @@ class Subscriber
     public static function registerTableMetaModelAttributeEvents(BuildDataDefinitionEvent $event)
     {
         static $registered;
-        if ($registered)
-        {
+        if ($registered) {
             return;
         }
         $registered = true;
@@ -143,17 +141,14 @@ class Subscriber
         $table   = $model->getProperty('tag_table');
         $databse = \Database::getInstance();
 
-        if (!$table || !$databse->tableExists($table))
-        {
+        if (!$table || !$databse->tableExists($table)) {
             return;
         }
 
         $result = array();
 
-        foreach ($databse->listFields($table) as $arrInfo)
-        {
-            if ($arrInfo['type'] != 'index')
-            {
+        foreach ($databse->listFields($table) as $arrInfo) {
+            if ($arrInfo['type'] != 'index') {
                 $result[$arrInfo['name']] = $arrInfo['name'];
             }
         }
@@ -174,17 +169,14 @@ class Subscriber
         $table   = $model->getProperty('tag_table');
         $databse = \Database::getInstance();
 
-        if (!$table || !$databse->tableExists($table))
-        {
+        if (!$table || !$databse->tableExists($table)) {
             return;
         }
 
         $result = array();
 
-        foreach ($databse->listFields($table) as $arrInfo)
-        {
-            if ($arrInfo['type'] != 'index' && $arrInfo['type'] == 'int')
-            {
+        foreach ($databse->listFields($table) as $arrInfo) {
+            if ($arrInfo['type'] != 'index' && $arrInfo['type'] == 'int') {
                 $result[$arrInfo['name']] = $arrInfo['name'];
             }
         }
@@ -208,8 +200,7 @@ class Subscriber
         $values = $event->getPropertyValueBag();
         $value  = $event->getValue();
 
-        if ($value)
-        {
+        if ($value) {
             $db = \Database::getInstance();
 
             $tableName    = $values->getPropertyValue('tag_table');
@@ -217,15 +208,15 @@ class Subscriber
             $sortColumn   = $values->getPropertyValue('tag_sorting') ?: $colNameId;
             $colNameWhere = $value;
 
-            $query = sprintf('
-                SELECT %1$s.*
+            $query = sprintf(
+                'SELECT %1$s.*
                 FROM %1$s%2$s
                 ORDER BY %1$s.%3$s',
                 // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                $tableName,                                                // 1
-                ($colNameWhere ? ' WHERE ('.$colNameWhere.')' : false),    // 2
-                $sortColumn                                                // 3
-            // @codingStandardsIgnoreEnd
+                $tableName,                                                 // 1
+                ($colNameWhere ? ' WHERE (' . $colNameWhere . ')' : false), // 2
+                $sortColumn                                                 // 3
+                // @codingStandardsIgnoreEnd
             );
 
             // Replace insert tags but do not cache.
@@ -235,14 +226,11 @@ class Subscriber
             $dispatcher->dispatch(ContaoEvents::CONTROLLER_REPLACE_INSERT_TAGS, $event);
             $query = $event->getBuffer();
 
-            try
-            {
+            try {
                 $db
                     ->prepare($query)
                     ->execute();
-            }
-            catch(\Exception $e)
-            {
+            } catch (\Exception $e) {
                 throw new \RuntimeException($GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']);
             }
         }
