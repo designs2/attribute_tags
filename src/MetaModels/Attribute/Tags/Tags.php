@@ -443,12 +443,12 @@ class Tags extends BaseComplex
      */
     public function setDataFor($arrValues)
     {
-        $db      = \Database::getInstance();
-        $itemIds = array_map('intval', array_keys($arrValues));
+        $database = \Database::getInstance();
+        $itemIds  = array_map('intval', array_keys($arrValues));
         sort($itemIds);
         // Load all existing tags for all items to be updated, keep the ordering to item Id
         // so we can benefit from the batch deletion and insert algorithm.
-        $existingTagIds = $db
+        $existingTagIds = $database
             ->prepare(
                 sprintf(
                     'SELECT * FROM tl_metamodel_tag_relation
@@ -473,7 +473,7 @@ class Tags extends BaseComplex
         }
 
         if ($insertValues) {
-            $db->execute(
+            $database->execute(
                 'INSERT INTO tl_metamodel_tag_relation
                 (att_id, item_id, value_sorting, value_id)
                 VALUES ' . implode(',', $insertValues)
