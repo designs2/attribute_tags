@@ -116,9 +116,15 @@ class Tags extends BaseComplex
             $arrFieldDef['inputType'] = 'checkbox';
         }
 
-        $arrFieldDef['options']                    = $this->getFilterOptions(null, false);
+        try {
+            $arrFieldDef['options'] = $this->getFilterOptions(null, false);
+        } catch (\Exception $exception) {
+            $arrFieldDef['options'] = 'Error: ' . $exception->getMessage();
+        }
+
         $arrFieldDef['eval']['includeBlankOption'] = true;
         $arrFieldDef['eval']['multiple']           = true;
+
         return $arrFieldDef;
     }
 
