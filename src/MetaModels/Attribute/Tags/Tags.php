@@ -107,8 +107,8 @@ class Tags extends BaseComplex
         if ($this->isTreePicker()) {
             $arrFieldDef['inputType']          = 'DcGeneralTreePicker';
             $arrFieldDef['eval']['sourceName'] = $this->get('tag_table');
-            $arrFieldDef['eval']['sourceName'] = $this->get('tag_table');
             $arrFieldDef['eval']['fieldType']  = 'checkbox';
+            $arrFieldDef['eval']['idProperty'] = $this->get('tag_alias');
         } elseif ($this->widgetMode == 1) {
             // If tag as wizard is true, change the input type.
             $arrFieldDef['inputType'] = 'checkboxWizard';
