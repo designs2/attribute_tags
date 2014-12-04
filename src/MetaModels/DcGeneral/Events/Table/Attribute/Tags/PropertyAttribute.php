@@ -277,9 +277,9 @@ class PropertyAttribute extends BaseSubscriber
             $event->setOptions(
                 array
                 (
-                    $GLOBALS['TL_LANG']['tl_metamodel_attribute']['select_column_type']['sql']
+                    $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column_type']['sql']
                         => array_diff_key(self::getColumnNamesFrom($table), array_flip(array_keys($attributes))),
-                    $GLOBALS['TL_LANG']['tl_metamodel_attribute']['select_column_type']['attribute']
+                    $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column_type']['attribute']
                         => $attributes
                 )
             );
@@ -305,7 +305,7 @@ class PropertyAttribute extends BaseSubscriber
     public static function getFilters(GetPropertyOptionsEvent $event)
     {
         $model     = $event->getModel();
-        $metaModel = self::getMetaModelFromTableName(func_get_arg(2), $model->getProperty('select_table'));
+        $metaModel = self::getMetaModelFromTableName(func_get_arg(2), $model->getProperty('tag_table'));
 
         if ($metaModel) {
             $filter = \Database::getInstance()

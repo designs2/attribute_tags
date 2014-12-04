@@ -64,7 +64,7 @@ class PropertyTagsWhere extends BaseSubscriber
                 EncodePropertyValueFromWidgetEvent::NAME => __CLASS__ . '::checkQuery',
             ),
             $dispatcher,
-            array('tl_metamodel_attribute', 'tags_where')
+            array('tl_metamodel_attribute', 'tag_where')
         );
     }
 
