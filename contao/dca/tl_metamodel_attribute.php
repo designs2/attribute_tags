@@ -10,9 +10,14 @@
  * @package   AttributeTags
  * @author    Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author    Christian de la Haye <service@delahaye.de>
+ * @author    Stefan heimes <stefan_heimes@hotmail.com>
  * @copyright The MetaModels team.
  * @license   LGPL.
  * @filesource
+ */
+
+/**
+ * Table tl_metamodel_attribute
  */
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tags extends _simpleattribute_'] = array
@@ -24,7 +29,9 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['tags extends _simp
         'tag_id',
         'tag_alias',
         'tag_sorting',
-        'tag_where'
+        'tag_where',
+        'tag_filter',
+        'tag_filterparams'
     )
 );
 
@@ -118,5 +125,31 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_where'] = array
         'tl_class'       => 'clr',
         'style'          => 'height: 4em;',
         'decodeEntities' => 'true'
+    )
+);
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_filter'] = array
+(
+    'label'            => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filter'],
+    'exclude'          => true,
+    'inputType'        => 'select',
+    'eval'             => array
+    (
+        'includeBlankOption' => true,
+        'alwaysSave'         => true,
+        'submitOnChange'     => true,
+        'tl_class'           => 'w50',
+        'chosen'             => 'true'
+    ),
+);
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_filterparams'] = array
+(
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filterparams'],
+    'exclude'   => true,
+    'inputType' => 'mm_subdca',
+    'eval'      => array
+    (
+        'tl_class'   => 'clr m12'
     )
 );
