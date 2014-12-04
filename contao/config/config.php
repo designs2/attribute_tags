@@ -6,16 +6,20 @@
  * data in each collection.
  *
  * PHP version 5
- *
- * @package   AttributeTags
- * @author    Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @copyright The MetaModels team.
- * @license   LGPL.
+ * @package     MetaModels
+ * @subpackage  AttributeTags
+ * @author      Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author      Stefan heimes <stefan_heimes@hotmail.com>
+ * @copyright   The MetaModels team.
+ * @license     LGPL.
  * @filesource
  */
 
-$GLOBALS['METAMODELS']['attributes']['tags']['class'] = 'MetaModels\Attribute\Tags\Tags';
-$GLOBALS['METAMODELS']['attributes']['tags']['image'] = 'system/modules/metamodelsattribute_tags/html/tags.png';
+$GLOBALS['TL_EVENTS'][\ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent::NAME][] =
+    'MetaModels\DcGeneral\Events\Table\Attribute\Tags\PropertyAttribute::registerEvents';
 
 $GLOBALS['TL_EVENTS'][\ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent::NAME][] =
-    'MetaModels\DcGeneral\Events\Table\Attribute\Tags\Subscriber::registerEvents';
+    'MetaModels\DcGeneral\Events\Table\Attribute\Tags\PropertyTagsWhere::registerEvents';
+
+$GLOBALS['TL_EVENT_SUBSCRIBERS'][] = 'MetaModels\Attribute\Tags\AttributeTypeFactory';
+$GLOBALS['TL_EVENT_SUBSCRIBERS'][] = 'MetaModels\DcGeneral\Events\MetaModels\Tags\BackendSubscriber';
