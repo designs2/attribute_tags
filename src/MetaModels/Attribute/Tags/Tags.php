@@ -29,111 +29,15 @@ use \Contao\Database\Result;
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Christian de la Haye <service@delahaye.de>
  */
-class Tags extends BaseComplex
+class Tags extends AbstractTags
 {
-
-    /**
-     * The widget mode to use.
-     *
-     * @var int
-     */
-    protected $widgetMode;
-
-    /**
-     * Determine if we want to use tree selection.
-     *
-     * @return bool
-     */
-    protected function isTreePicker()
-    {
-        return $this->widgetMode == 2;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function prepareTemplate(Template $objTemplate, $arrRowData, $objSettings = null)
-    {
-        parent::prepareTemplate($objTemplate, $arrRowData, $objSettings);
-        $objTemplate->alias = $this->get('tag_alias');
-        $objTemplate->value = $this->get('tag_column');
-    }
-
-    /**
-     * Determine the column to be used for alias.
-     *
-     * This is either the configured alias column or the id, if an alias column is absent.
-     *
-     * @return string the name of the column.
-     */
-    public function getAliasCol()
-    {
-        $strColNameAlias = $this->get('tag_alias');
-        if ($this->isTreePicker() || !$strColNameAlias) {
-            $strColNameAlias = $this->get('tag_id');
-        }
-        return $strColNameAlias;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAttributeSettingNames()
-    {
-        return array_merge(
-            parent::getAttributeSettingNames(),
-            array(
-                'tag_table',
-                'tag_column',
-                'tag_id',
-                'tag_alias',
-                'tag_where',
-                'tag_sorting',
-                'tag_as_wizard',
-                'mandatory',
-                'filterable',
-                'searchable',
-            )
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldDefinition($arrOverrides = array())
-    {
-        $arrFieldDef      = parent::getFieldDefinition($arrOverrides);
-        $this->widgetMode = $arrOverrides['tag_as_wizard'];
-        if ($this->isTreePicker()) {
-            $arrFieldDef['inputType']          = 'DcGeneralTreePicker';
-            $arrFieldDef['eval']['sourceName'] = $this->get('tag_table');
-            $arrFieldDef['eval']['fieldType']  = 'checkbox';
-            $arrFieldDef['eval']['idProperty'] = $this->get('tag_alias');
-        } elseif ($this->widgetMode == 1) {
-            // If tag as wizard is true, change the input type.
-            $arrFieldDef['inputType'] = 'checkboxWizard';
-        } else {
-            $arrFieldDef['inputType'] = 'checkbox';
-        }
-
-        try {
-            $arrFieldDef['options'] = $this->getFilterOptions(null, false);
-        } catch (\Exception $exception) {
-            $arrFieldDef['options'] = 'Error: ' . $exception->getMessage();
-        }
-
-        $arrFieldDef['eval']['includeBlankOption'] = true;
-        $arrFieldDef['eval']['multiple']           = true;
-
-        return $arrFieldDef;
-    }
 
     /**
      * {@inheritdoc}
      */
     public function valueToWidget($varValue)
     {
-        $strColNameAlias = $this->getAliasCol();
+        $strColNameAlias = $this->getAliasColumn();
 
         $arrResult = array();
         if ($varValue) {
@@ -172,8 +76,8 @@ class Tags extends BaseComplex
                     SELECT %1$s.*
                     FROM %1$s
                     WHERE %2$s IN (%3$s)',
-                    $this->get('tag_table'),
-                    $this->getAliasCol(),
+                    $this->getTagSource(),
+                    $this->getAliasColumn(),
                     implode(',', $arrSearch)
                 )
             )
@@ -184,7 +88,7 @@ class Tags extends BaseComplex
 
         while ($objValue->next()) {
             // Adding the sorting from widget.
-            $strAlias                                                 = $this->getAliasCol();
+            $strAlias                                                 = $this->getAliasColumn();
             $arrResult[$objValue->$strColNameId]                      = $objValue->row();
             $arrResult[$objValue->$strColNameId]['tag_value_sorting'] = array_search($objValue->$strAlias, $varValue);
         }
@@ -201,17 +105,17 @@ class Tags extends BaseComplex
      */
     public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
     {
-        $strTableName    = $this->get('tag_table');
-        $strColNameId    = $this->get('tag_id');
-        $strSortColumn   = $this->get('tag_sorting') ?: $strColNameId;
-        $strColNameWhere = ($this->get('tag_where') ? html_entity_decode($this->get('tag_where')) : false);
-        $objDB           = \Database::getInstance();
+        $strTableName    = $this->getTagSource();
+        $strColNameId    = $this->getIdColumn();
+        $strSortColumn   = $this->getSortingColumn() ?: $strColNameId;
+        $strColNameWhere = ($this->getWhereColumn() ? html_entity_decode($this->getWhereColumn()) : false);
+        $objDB           = $this->getDatabase();
 
         $arrReturn = array();
 
         if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId && $strSortColumn) {
-            $strColNameValue = $this->get('tag_column');
-            $strColNameAlias = $this->getAliasCol();
+            $strColNameValue = $this->getValueColumn();
+            $strColNameAlias = $this->getAliasColumn();
 
             if ($arrIds) {
                 if ($usedOnly) {
@@ -305,20 +209,11 @@ class Tags extends BaseComplex
     /**
      * {@inheritdoc}
      */
-    public function searchFor($strPattern)
-    {
-        $objFilterRule = new FilterRuleTags($this, $strPattern);
-        return $objFilterRule->getMatchingIds();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getDataFor($arrIds)
     {
-        $strTableName = $this->get('tag_table');
-        $strColNameId = $this->get('tag_id');
-        $objDB        = \Database::getInstance();
+        $strTableName = $this->getTagSource();
+        $strColNameId = $this->getIdColumn();
+        $objDB        = $this->getDatabase();
         $arrReturn    = array();
 
         if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId) {
@@ -371,7 +266,7 @@ class Tags extends BaseComplex
      */
     protected function setDataForItem($itemId, $tags, $existingTagIds)
     {
-        $objDB = \Database::getInstance();
+        $objDB = $this->getDatabase();
 
         if ($tags === null) {
             $tagIds = array();
@@ -488,29 +383,34 @@ class Tags extends BaseComplex
     }
 
     /**
-     * {@inheritDoc}
+     * Convert the passed values to a list of value ids.
      *
-     * @throws \RuntimeException When an invalid id array has been passed.
+     * @param string[] $values The values to convert.
+     *
+     * @return int[]
      */
-    public function unsetDataFor($arrIds)
+    public function convertValuesToValueIds($values)
     {
-        if ($arrIds) {
-            if (!is_array($arrIds)) {
-                throw new \RuntimeException(
-                    'MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.',
-                    1
-                );
-            }
-            $objDB = \Database::getInstance();
-            $objDB->prepare(
-                sprintf(
-                    'DELETE FROM tl_metamodel_tag_relation
-                    WHERE
-                    att_id=?
-                    AND item_id IN (%s)',
-                    implode(',', $arrIds)
-                )
-            )->execute($this->get('id'));
+        $strTableNameId  = $this->getTagSource();
+        $strColNameId    = $this->getIdColumn();
+        $strColNameAlias = $this->getAliasColumn();
+
+        if ($strColNameAlias) {
+            $objSelectIds = $this->getDatabase()
+                ->prepare(sprintf(
+                        'SELECT %s FROM %s WHERE %s IN (%s)',
+                        $strColNameId,
+                        $strTableNameId,
+                        $strColNameAlias,
+                        implode(',', array_fill(0, count($values), '?'))
+                    ))
+                ->executeUncached($values);
+
+            $values = $objSelectIds->fetchEach($strColNameId);
+        } else {
+            $values = array_map('intval', $values);
         }
+
+        return $values;
     }
 }
