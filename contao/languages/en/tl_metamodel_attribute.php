@@ -33,5 +33,19 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting'][1]      = 'Please s
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where'][0]        = 'SQL';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_where'][1]        =
     'The list of options can be limited by using SQL.';
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error'][0]        = 'The SQL query causes an error.';
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error'][1]        = 'The SQL query causes an error.';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filter'][0]       = 'Filter';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filter'][1]       = 'Here you can choose the filter to use.';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filterparams'][0] = 'Filter parameters';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filterparams'][1] = 'Here you can choose a default value for the filter.';
+
+/**
+ * Misc.
+ */
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']             = 'The SQL query causes an error.';
+
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table_type']['translated']   = 'Translated MetaModels';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table_type']['untranslated'] = 'Untranslated MetaModels';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table_type']['sql-table']    = 'SQL Table';
+
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column_type']['attribute'] = 'MetaModel attributes';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column_type']['sql']       = 'SQL table column';
