@@ -112,6 +112,18 @@ abstract class AbstractTags extends BaseComplex
     }
 
     /**
+     * Determine the correct alias column to use.
+     *
+     * @return string
+     *
+     * @deprecated Use the getAliasColumn function instead.
+     */
+    protected function getAliasCol()
+    {
+        return $this->getAliasColumn();
+    }
+
+    /**
      * Determine the correct where column to use.
      *
      * @return string
