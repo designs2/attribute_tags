@@ -17,10 +17,7 @@
 
 namespace MetaModels\Attribute\Tags;
 
-use MetaModels\Attribute\BaseComplex;
-use MetaModels\Render\Template;
-use MetaModels\Filter\Rules\FilterRuleTags;
-use \Contao\Database\Result;
+use Contao\Database\Result;
 
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
