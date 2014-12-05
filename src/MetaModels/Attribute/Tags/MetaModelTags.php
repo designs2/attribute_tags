@@ -369,18 +369,16 @@ class MetaModelTags extends AbstractTags
         // First pass, delete all not mentioned anymore.
         $valuesToRemove = array_diff($thisExisting, $tagIds);
         if ($valuesToRemove) {
-            $objDB
-                ->prepare(
+            $database->prepare(
                     sprintf(
                         'DELETE FROM tl_metamodel_tag_relation
-                        WHERE
-                        att_id=?
+                        WHERE att_id=?
                         AND item_id=?
                         AND value_id IN (%s)',
-                        implode(',', $valuesToRemove)
+                        implode(',', array_fill(0, count($valuesToRemove), '?'))
                     )
                 )
-                ->execute($this->get('id'), $itemId);
+                ->execute(array_merge(array($this->get('id'), $itemId), $valuesToRemove));
         }
 
         // Second pass, add all new values in a row.
@@ -406,12 +404,10 @@ class MetaModelTags extends AbstractTags
                     continue;
                 }
 
-                $objDB
-                    ->prepare(
+                $database->prepare(
                         'UPDATE tl_metamodel_tag_relation
                         SET value_sorting = ' . (int)$tags[$valueId]['tag_value_sorting'] . '
-                        WHERE
-                        att_id=?
+                        WHERE att_id=?
                         AND item_id=?
                         AND value_id=?'
                     )
@@ -441,15 +437,14 @@ class MetaModelTags extends AbstractTags
             ->prepare(
                 sprintf(
                     'SELECT * FROM %1$s
-                    WHERE
-                    att_id=?
+                    WHERE att_id=?
                     AND item_id IN (%2$s)
                     ORDER BY item_id ASC',
                     $this->getReferenceTable(),
-                    implode(',', $itemIds)
+                    implode(',', array_fill(0, count($itemIds), '?')) // 1
                 )
             )
-            ->execute($this->get('id'));
+            ->execute(array_merge(array($this->get('id')), $itemIds));
 
         // Now loop over all items and update the values for them.
         // NOTE: we can not loop over the original array, as the item ids are not neccessarily
