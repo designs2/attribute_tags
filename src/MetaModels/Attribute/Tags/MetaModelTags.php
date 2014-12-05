@@ -52,7 +52,7 @@ class MetaModelTags extends AbstractTags
      *
      * @return IMetaModel
      */
-    protected function getSelectMetaModel()
+    protected function getTagMetaModel()
     {
         if (empty($this->objSelectMetaModel)) {
             $this->objSelectMetaModel = MetaModelFactory::byTableName($this->getTagSource());
@@ -140,7 +140,7 @@ class MetaModelTags extends AbstractTags
         $strSortingValue    = $this->getSortingColumn();
         $strCurrentLanguage = null;
 
-        if (!($this->getSelectMetaModel() && $strDisplayValue)) {
+        if (!($this->getTagMetaModel() && $strDisplayValue)) {
             return array();
         }
 
@@ -150,7 +150,7 @@ class MetaModelTags extends AbstractTags
             $GLOBALS['TL_LANGUAGE'] = $this->getMetaModel()->getActiveLanguage();
         }
 
-        $filter = $this->getSelectMetaModel()->getEmptyFilter();
+        $filter = $this->getTagMetaModel()->getEmptyFilter();
 
         $this->buildFilterRulesForFilterSetting($filter);
 
@@ -161,7 +161,7 @@ class MetaModelTags extends AbstractTags
             $filter->addFilterRule(new StaticIdList($arrIds));
         }
 
-        $objItems = $this->getSelectMetaModel()->findByFilter($filter, $strSortingValue);
+        $objItems = $this->getTagMetaModel()->findByFilter($filter, $strSortingValue);
 
         // Reset language.
         if (TL_MODE == 'BE') {
@@ -484,7 +484,7 @@ class MetaModelTags extends AbstractTags
 
         if ($strColNameAlias) {
             /** @var MetaModelTags $attribute */
-            $metaModel       = $this->getSelectMetaModel();
+            $metaModel       = $this->getTagMetaModel();
             $sanitizedValues = array();
             foreach ($values as $value) {
                 $valueIds = $metaModel->getAttribute($strColNameAlias)->searchFor($value);
