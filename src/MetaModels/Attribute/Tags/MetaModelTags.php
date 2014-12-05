@@ -62,18 +62,51 @@ class MetaModelTags extends AbstractTags
     }
 
     /**
+     * Retrieve the values with the given ids.
+     *
+     * @param int[] $valueIds The ids of the values to retrieve.
+     *
+     * @return array
+     */
+    protected function getValuesById($valueIds)
+    {
+        $metaModel = $this->getTagMetaModel();
+        $filter    = $metaModel->getEmptyFilter();
+        $filter->addFilterRule(new StaticIdList($valueIds));
+
+        $items  = $metaModel->findByFilter($filter, 'id');
+        $values = array();
+        foreach ($items as $item) {
+            $valueId    = $item->get('id');
+            $parsedItem = $item->parseValue();
+
+            $values[$valueId] = array_merge(
+                array(self::TAGS_RAW => $parsedItem['raw']),
+                $parsedItem['text']
+            );
+        }
+
+        return $values;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function valueToWidget($varValue)
     {
-        $strColNameAlias = $this->getAliasColumn();
+        $aliasColumn = $this->getAliasColumn();
+        $arrResult   = array();
 
-        $arrResult = array();
         if ($varValue) {
             foreach ($varValue as $arrValue) {
-                $arrResult[] = $arrValue[$strColNameAlias];
+                $aliasValue = ($aliasColumn == 'id') ? $arrValue[self::TAGS_RAW]['id'] : $arrValue[$aliasColumn];
+
+                if (!empty($aliasValue)) {
+                    $arrResult[] = $aliasValue;
+                }
             }
         }
+
         return $arrResult;
     }
 
@@ -83,46 +116,57 @@ class MetaModelTags extends AbstractTags
     // @codingStandardsIgnoreStart - ignore unused parameter $intId.
     public function widgetToValue($varValue, $intId)
     {
-        // If we are in tree mode, we got a comma separate list.
-        if ($this->isTreePicker() && !empty($varValue) && !is_array($varValue)) {
-            $varValue = explode(',', $varValue);
+        if ($this->isTreePicker()) {
+            $varValue = trimsplit(',', $varValue);
         }
 
-        if ((!is_array($varValue)) || empty($varValue)) {
-            return array();
+        if ($varValue == '') {
+            $varValue = array();
         }
 
-        $arrSearch = array();
-        $arrParams = array();
-        foreach ($varValue as $strValue) {
-            $arrSearch[] = '?';
-            $arrParams[] = $strValue;
-        }
-        $objDB    = \Database::getInstance();
-        $objValue = $objDB
-            ->prepare(
-                sprintf('
-                    SELECT %1$s.*
-                    FROM %1$s
-                    WHERE %2$s IN (%3$s)',
-                    $this->getTagSource(),
-                    $this->getAliasColumn(),
-                    implode(',', $arrSearch)
-                )
-            )
-            ->execute($arrParams);
-
-        $strColNameId = $this->getIdColumn();
-        $arrResult    = array();
-
-        while ($objValue->next()) {
-            // Adding the sorting from widget.
-            $strAlias                                                 = $this->getAliasColumn();
-            $arrResult[$objValue->$strColNameId]                      = $objValue->row();
-            $arrResult[$objValue->$strColNameId]['tag_value_sorting'] = array_search($objValue->$strAlias, $varValue);
+        if (!is_array($varValue)) {
+            throw new \InvalidArgumentException('Incorrect values encountered ' . var_export($varValue, true));
         }
 
-        return $arrResult;
+        $model     = $this->getTagMetaModel();
+        $alias     = $this->getAliasColumn();
+        $attribute = $model->getAttribute($alias);
+        $valueId   = array();
+
+        if ($attribute) {
+            // It is an attribute, we may search for it.
+            foreach($varValue as $value)
+            {
+                $ids = $attribute->searchFor($value);
+                if ($ids) {
+                    $valueId = array_merge($valueId, $ids);
+                }
+            }
+        } else {
+            // Must be a system column then.
+            // Special case first, the id is our alias, easy way out.
+            if ($alias === 'id') {
+                $valueId = $varValue;
+            } else {
+                $result = $this->getDatabase()
+                    ->prepare(
+                        sprintf(
+                            'SELECT v.id FROM %1$s AS v WHERE v.%2$s=?',
+                            $model,
+                            $alias
+                        )
+                    )
+                    ->execute($varValue);
+
+                if (!$result->numRows) {
+                    throw new \RuntimeException('Could not translate value ' . var_export($varValue, true));
+                }
+
+                $valueId = $result->fetchEach('id');
+            }
+        }
+
+        return $this->getValuesById($valueId);
     }
     // @codingStandardsIgnoreEnd
 
