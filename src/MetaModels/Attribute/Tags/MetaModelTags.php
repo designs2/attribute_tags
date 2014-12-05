@@ -323,9 +323,7 @@ class MetaModelTags extends AbstractTags
             $parsed = $item->parseValue();
 
             $textValue  = ($displayValue == 'id') ? $item->get('id') : $parsed['text'][$displayValue];
-            $aliasValue = isset($parsed['text'][$aliasColumn])
-                ? $parsed['text'][$aliasColumn]
-                : $parsed['raw'][$aliasColumn];
+            $aliasValue = ($aliasColumn == 'id') ? $item->get('id') :  $parsed['text'][$aliasColumn];
 
             $result[$aliasValue] = $textValue;
         }
@@ -338,46 +336,57 @@ class MetaModelTags extends AbstractTags
      */
     public function getDataFor($arrIds)
     {
-        $strTableName = $this->getTagSource();
-        $strColNameId = $this->getIdColumn();
-        $objDB        = $this->getDatabase();
-        $arrReturn    = array();
+        $result       = array();
+        $displayValue = $this->getValueColumn();
+        $metaModel    = $this->getTagMetaModel();
 
-        if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId) {
-            $strMetaModelTableName   = $this->getMetaModel()->getTableName();
-            $strMetaModelTableNameId = $strMetaModelTableName . '_id';
-
-            $objValue = $objDB
-                ->prepare(
+        if ($this->getTagSource() && $metaModel && $displayValue) {
+            $rows =  $this->getDatabase()->prepare(
                     sprintf(
-                        'SELECT %1$s.*, tl_metamodel_tag_relation.item_id AS %2$s
-                        FROM %1$s
-                        LEFT JOIN tl_metamodel_tag_relation ON (
-                            (tl_metamodel_tag_relation.att_id=?)
-                            AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
-                        )
-                        WHERE tl_metamodel_tag_relation.item_id IN (%4$s)
+                        'SELECT item_id AS id, value_id AS value
+                        FROM tl_metamodel_tag_relation
+                        WHERE tl_metamodel_tag_relation.item_id IN (%1$s)
+                        AND att_id = ?
+                        GROUP BY value_id
                         ORDER BY tl_metamodel_tag_relation.value_sorting',
                         // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                        $strTableName,            // 1
-                        $strMetaModelTableNameId, // 2
-                        $strColNameId,            // 3
-                        implode(',', $arrIds)     // 4
-                    // @codingStandardsIgnoreEnd
+                        implode(',', array_fill(0, count($arrIds), '?')) // 1
+                        // @codingStandardsIgnoreEnd
                     )
                 )
-                ->execute($this->get('id'));
+                ->executeUncached(array_merge($arrIds, array($this->get('id'))));
 
-            while ($objValue->next()) {
-                if (!$arrReturn[$objValue->$strMetaModelTableNameId]) {
-                    $arrReturn[$objValue->$strMetaModelTableNameId] = array();
+            $valueIds     = array();
+            $referenceIds = array();
+
+            while ($rows->next()) {
+                $valueIds[$rows->id][] = $rows->value;
+                $referenceIds[]        = $rows->value;
+            }
+
+            $filter = $metaModel->getEmptyFilter();
+            $filter->addFilterRule(new StaticIdList($referenceIds));
+
+            $items  = $metaModel->findByFilter($filter, 'id');
+            $values = array();
+            foreach ($items as $item) {
+                $valueId    = $item->get('id');
+                $parsedItem = $item->parseValue();
+
+                $values[$valueId] = array_merge(
+                    array(self::TAGS_RAW  => $parsedItem['raw']),
+                    $parsedItem['text']
+                );
+            }
+
+            foreach ($valueIds as $itemId => $tagIds) {
+                foreach ($tagIds as $tagId) {
+                    $result[$itemId][$tagId] = $values[$tagId];
                 }
-                $arrData = $objValue->row();
-                unset($arrData[$strMetaModelTableNameId]);
-                $arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
             }
         }
-        return $arrReturn;
+
+        return $result;
     }
 
     /**
@@ -393,12 +402,12 @@ class MetaModelTags extends AbstractTags
      */
     protected function setDataForItem($itemId, $tags, $existingTagIds)
     {
-        $objDB = \Database::getInstance();
+        $database = $this->getDatabase();
 
         if ($tags === null) {
             $tagIds = array();
         } else {
-            $tagIds = array_map('intval', array_keys($tags));
+            $tagIds = array_keys($tags);
         }
         $thisExisting = array();
 
@@ -406,6 +415,7 @@ class MetaModelTags extends AbstractTags
         if (($existingTagIds->item_id == $itemId)) {
             $thisExisting[] = $existingTagIds->value_id;
         }
+
         while ($existingTagIds->next() && ($existingTagIds->item_id == $itemId)) {
             $thisExisting[] = $existingTagIds->value_id;
         }
