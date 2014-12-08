@@ -116,7 +116,7 @@ class MetaModelTags extends AbstractTags
     // @codingStandardsIgnoreStart - ignore unused parameter $intId.
     public function widgetToValue($varValue, $intId)
     {
-        if ($this->isTreePicker()) {
+        if ($this->isTreePicker() && is_string($varValue)) {
             $varValue = trimsplit(',', $varValue);
         }
 
