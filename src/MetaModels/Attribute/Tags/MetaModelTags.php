@@ -276,26 +276,34 @@ class MetaModelTags extends AbstractTags
         if (empty($idList)) {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT %2$s FROM %1$s GROUP BY %2$s',
-                $this->getMetaModel()->getTableName(),  // 1
-                $this->getColName()                     // 2
+                'SELECT value_id AS value
+                     FROM tl_metamodel_tag_relation
+                     WHERE att_id = ?
+                     GROUP BY value_id'
             // @codingStandardsIgnoreEnd
             );
+
+            $arrUsedValues = $this->getDatabase()
+                ->prepare($query)
+                ->execute()
+                ->fetchEach('value_id');
         } else {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT %2$s FROM %1$s WHERE id IN (\'%3$s\') GROUP BY %2$s',
-                $this->getMetaModel()->getTableName(),  // 1
-                $this->getColName(),                    // 2
-                implode("', '", $idList)                // 3
+                'SELECT value_id AS value
+                    FROM tl_metamodel_tag_relation
+                    WHERE att_id = ?
+                      AND item_id IN (%s)
+                    GROUP BY value_id',
+                implode(',', array_fill(0, count($idList), '?')) // 1
             // @codingStandardsIgnoreEnd
             );
-        }
 
-        $arrUsedValues = $this->getDatabase()
-            ->prepare($query)
-            ->execute()
-            ->fetchEach($this->getColName());
+            $arrUsedValues = $this->getDatabase()
+                ->prepare($query)
+                ->execute($idList)
+                ->fetchEach('value_id');
+        }
 
         $arrUsedValues = array_filter(
             $arrUsedValues,
