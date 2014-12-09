@@ -17,7 +17,7 @@
 
 namespace MetaModels\Filter\Rules;
 
-use MetaModels\Attribute\Tags\Tags;
+use MetaModels\Attribute\Tags\AbstractTags;
 use MetaModels\Filter\FilterRule;
 
 /**
@@ -31,7 +31,7 @@ class FilterRuleTags extends FilterRule
     /**
      * The attribute to filter.
      *
-     * @var Tags
+     * @var AbstractTags
      */
     protected $objAttribute;
 
@@ -45,7 +45,7 @@ class FilterRuleTags extends FilterRule
     /**
      * {@inheritDoc}
      */
-    public function __construct(Tags $objAttribute, $strValue)
+    public function __construct(AbstractTags $objAttribute, $strValue)
     {
         parent::__construct();
 
