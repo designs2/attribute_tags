@@ -278,7 +278,7 @@ class MetaModelTags extends AbstractTags
         if (empty($idList)) {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT value_id As value
+                'SELECT value_id AS value
                      FROM tl_metamodel_tag_relation
                      WHERE att_id = ?
                      GROUP BY value'
@@ -293,7 +293,7 @@ class MetaModelTags extends AbstractTags
         } else {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT value_id As value
+                'SELECT value_id AS value
                     FROM tl_metamodel_tag_relation
                     WHERE att_id = ?
                       AND item_id IN (%s)
