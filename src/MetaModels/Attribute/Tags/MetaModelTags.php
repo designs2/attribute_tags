@@ -278,26 +278,26 @@ class MetaModelTags extends AbstractTags
         if (empty($idList)) {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT value_id
+                'SELECT value_id As value
                      FROM tl_metamodel_tag_relation
                      WHERE att_id = ?
-                     GROUP BY value_id'
+                     GROUP BY value'
             // @codingStandardsIgnoreEnd
             );
 
             $arrUsedValues = $this->getDatabase()
                 ->prepare($query)
                 ->execute($params)
-                ->fetchEach('value_id');
+                ->fetchEach('value');
 
         } else {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT value_id
+                'SELECT value_id As value
                     FROM tl_metamodel_tag_relation
                     WHERE att_id = ?
                       AND item_id IN (%s)
-                    GROUP BY value_id',
+                    GROUP BY value',
                 implode(',', array_fill(0, count($idList), '?')) // 1
             // @codingStandardsIgnoreEnd
             );
@@ -305,7 +305,7 @@ class MetaModelTags extends AbstractTags
             $arrUsedValues = $this->getDatabase()
                 ->prepare($query)
                 ->execute(array_merge($params, $idList))
-                ->fetchEach('value_id');
+                ->fetchEach('value');
 
         }
 
