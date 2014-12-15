@@ -200,7 +200,7 @@ class MetaModelTags extends AbstractTags
 
         // Add some more filter rules.
         if ($usedOnly) {
-            $this->buildFilterRulesForUsedOnly($filter);
+            $this->buildFilterRulesForUsedOnly($filter, $arrIds);
         } elseif ($arrIds && is_array($arrIds)) {
             $filter->addFilterRule(new StaticIdList($arrIds));
         }
@@ -273,10 +273,12 @@ class MetaModelTags extends AbstractTags
      */
     public function buildFilterRulesForUsedOnly($filter, $idList = array())
     {
+        $params = array($this->get('id'));
+
         if (empty($idList)) {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT value_id AS value
+                'SELECT value_id
                      FROM tl_metamodel_tag_relation
                      WHERE att_id = ?
                      GROUP BY value_id'
@@ -285,12 +287,13 @@ class MetaModelTags extends AbstractTags
 
             $arrUsedValues = $this->getDatabase()
                 ->prepare($query)
-                ->execute()
+                ->execute($params)
                 ->fetchEach('value_id');
+
         } else {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                'SELECT value_id AS value
+                'SELECT value_id
                     FROM tl_metamodel_tag_relation
                     WHERE att_id = ?
                       AND item_id IN (%s)
@@ -301,8 +304,9 @@ class MetaModelTags extends AbstractTags
 
             $arrUsedValues = $this->getDatabase()
                 ->prepare($query)
-                ->execute($idList)
+                ->execute(array_merge($params, $idList))
                 ->fetchEach('value_id');
+
         }
 
         $arrUsedValues = array_filter(
