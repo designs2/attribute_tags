@@ -219,8 +219,8 @@ class Tags extends AbstractTags
         $arrReturn    = array();
 
         if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId) {
-            $strMetaModelTableName   = $this->getMetaModel()->getTableName();
-            $strMetaModelTableNameId = $strMetaModelTableName . '_id';
+            $metaModelTableName   = $this->getMetaModel()->getTableName();
+            $metaModelTableNameId = $metaModelTableName . '_id';
 
             $objValue = $objDB
                 ->prepare(
@@ -235,7 +235,7 @@ class Tags extends AbstractTags
                         ORDER BY tl_metamodel_tag_relation.value_sorting',
                         // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
                         $strTableName,            // 1
-                        $strMetaModelTableNameId, // 2
+                        $metaModelTableNameId, // 2
                         $strColNameId,            // 3
                         implode(',', $arrIds)     // 4
                     // @codingStandardsIgnoreEnd
@@ -244,12 +244,12 @@ class Tags extends AbstractTags
                 ->execute($this->get('id'));
 
             while ($objValue->next()) {
-                if (!$arrReturn[$objValue->$strMetaModelTableNameId]) {
-                    $arrReturn[$objValue->$strMetaModelTableNameId] = array();
+                if (!$arrReturn[$objValue->$metaModelTableNameId]) {
+                    $arrReturn[$objValue->$metaModelTableNameId] = array();
                 }
                 $arrData = $objValue->row();
-                unset($arrData[$strMetaModelTableNameId]);
-                $arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
+                unset($arrData[$metaModelTableNameId]);
+                $arrReturn[$objValue->$metaModelTableNameId][$objValue->$strColNameId] = $arrData;
             }
         }
         return $arrReturn;
