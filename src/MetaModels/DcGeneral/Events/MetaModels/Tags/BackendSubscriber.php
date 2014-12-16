@@ -20,22 +20,19 @@ namespace MetaModels\DcGeneral\Events\MetaModels\Tags;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use MetaModels\Attribute\Tags\AbstractTags;
 use MetaModels\DcGeneral\Data\Model;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use MetaModels\DcGeneral\Events\BaseSubscriber;
 
 /**
  * The subscriber for the get filter options call.
  */
-class BackendSubscriber implements EventSubscriberInterface
+class BackendSubscriber extends BaseSubscriber
 {
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedEvents()
+    public function registerEventsInDispatcher()
     {
-        return array
-        (
-            GetPropertyOptionsEvent::NAME => 'getPropertyOptions'
-        );
+        $this->addListener(GetPropertyOptionsEvent::NAME, array($this, 'getPropertyOptions'));
     }
 
     /**
