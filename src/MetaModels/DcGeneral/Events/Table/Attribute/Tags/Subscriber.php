@@ -163,6 +163,10 @@ class Subscriber extends BaseSubscriber
     {
         $metaModel = $this->getServiceContainer()->getFactory()->getMetaModel($metaModelName);
         $result    = array();
+        
+        if($metaModel === null){
+			return $result;
+		}
 
         foreach ($metaModel->getAttributes() as $attribute) {
             $name   = $attribute->getName();
