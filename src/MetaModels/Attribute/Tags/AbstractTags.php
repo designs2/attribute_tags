@@ -134,7 +134,7 @@ abstract class AbstractTags extends BaseComplex
     }
 
     /**
-     * Return the name of the table with the references. (m:n)
+     * Return the name of the table with the references. (m:n).
      *
      * @return string
      */

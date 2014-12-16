@@ -349,7 +349,9 @@ class MetaModelTags extends AbstractTags
         $metaModel    = $this->getTagMetaModel();
 
         if ($this->getTagSource() && $metaModel && $displayValue) {
-            $rows =  $this->getDatabase()->prepare(
+            $rows = $this
+                ->getDatabase()
+                ->prepare(
                     sprintf(
                         'SELECT item_id AS id, value_id AS value
                         FROM tl_metamodel_tag_relation
@@ -431,7 +433,8 @@ class MetaModelTags extends AbstractTags
         // First pass, delete all not mentioned anymore.
         $valuesToRemove = array_diff($thisExisting, $tagIds);
         if ($valuesToRemove) {
-            $database->prepare(
+            $database
+                ->prepare(
                     sprintf(
                         'DELETE FROM tl_metamodel_tag_relation
                         WHERE att_id=?
@@ -452,7 +455,7 @@ class MetaModelTags extends AbstractTags
                     '(%s,%s,%s,%s)',
                     $this->get('id'),
                     $itemId,
-                    (int)$tags[$valueId]['tag_value_sorting'],
+                    (int) $tags[$valueId]['tag_value_sorting'],
                     $valueId
                 );
             }
@@ -466,9 +469,10 @@ class MetaModelTags extends AbstractTags
                     continue;
                 }
 
-                $database->prepare(
+                $database
+                    ->prepare(
                         'UPDATE tl_metamodel_tag_relation
-                        SET value_sorting = ' . (int)$tags[$valueId]['tag_value_sorting'] . '
+                        SET value_sorting = ' . (int) $tags[$valueId]['tag_value_sorting'] . '
                         WHERE att_id=?
                         AND item_id=?
                         AND value_id=?'
@@ -503,7 +507,7 @@ class MetaModelTags extends AbstractTags
                     AND item_id IN (%2$s)
                     ORDER BY item_id ASC',
                     $this->getReferenceTable(),
-                    implode(',', array_fill(0, count($itemIds), '?')) // 1
+                    implode(',', array_fill(0, count($itemIds), '?'))
                 )
             )
             ->execute(array_merge(array($this->get('id')), $itemIds));

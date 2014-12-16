@@ -306,7 +306,7 @@ class Tags extends AbstractTags
                     '(%s,%s,%s,%s)',
                     $this->get('id'),
                     $itemId,
-                    (int)$tags[$valueId]['tag_value_sorting'],
+                    (int) $tags[$valueId]['tag_value_sorting'],
                     $valueId
                 );
             }
@@ -323,7 +323,7 @@ class Tags extends AbstractTags
                 $objDB
                     ->prepare(
                         'UPDATE tl_metamodel_tag_relation
-                        SET value_sorting = ' . (int)$tags[$valueId]['tag_value_sorting'] . '
+                        SET value_sorting = ' . (int) $tags[$valueId]['tag_value_sorting'] . '
                         WHERE
                         att_id=?
                         AND item_id=?
@@ -395,12 +395,12 @@ class Tags extends AbstractTags
         if ($strColNameAlias) {
             $objSelectIds = $this->getDatabase()
                 ->prepare(sprintf(
-                        'SELECT %s FROM %s WHERE %s IN (%s)',
-                        $strColNameId,
-                        $strTableNameId,
-                        $strColNameAlias,
-                        implode(',', array_fill(0, count($values), '?'))
-                    ))
+                    'SELECT %s FROM %s WHERE %s IN (%s)',
+                    $strColNameId,
+                    $strTableNameId,
+                    $strColNameAlias,
+                    implode(',', array_fill(0, count($values), '?'))
+                ))
                 ->executeUncached($values);
 
             $values = $objSelectIds->fetchEach($strColNameId);
