@@ -1,6 +1,6 @@
 {
   "name": "metamodels/attribute_tags",
-  "description": "MetaModels attribute for selects",
+  "description": "MetaModels attribute for tags",
   "keywords": [
     "contao",
     "metamodels",
@@ -42,7 +42,9 @@
     "contao-community-alliance/coding-standard": "~1.0",
     "cyberspectrum/contao-toolbox": "dev-master",
     "contao-community-alliance/build-system": "~1.0",
-    "contao-community-alliance/build-system-all-tasks": "~1.0"
+    "contao-community-alliance/build-system-all-tasks": "~1.0",
+    "metamodels/base-unit-tests": "~1.0"
+
   },
   "conflict": {
     "contao/core": "3.4.0"

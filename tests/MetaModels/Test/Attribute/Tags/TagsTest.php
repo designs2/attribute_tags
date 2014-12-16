@@ -17,7 +17,9 @@
 
 namespace MetaModels\Test\Attribute\Tags;
 
+use MetaModels\Attribute\Tags\MetaModelTags;
 use MetaModels\Attribute\Tags\Tags;
+use MetaModels\IMetaModel;
 
 /**
  * Unit tests to test class Tags.
@@ -67,5 +69,16 @@ class TagsTest extends \PHPUnit_Framework_TestCase
     {
         $text = new Tags($this->mockMetaModel('en', 'en'));
         $this->assertInstanceOf('MetaModels\Attribute\Tags\Tags', $text);
+    }
+
+    /**
+     * Test that the attribute can be instantiated.
+     *
+     * @return void
+     */
+    public function testInstantiationMetaModelSelect()
+    {
+        $text = new MetaModelTags($this->mockMetaModel('en', 'en'));
+        $this->assertInstanceOf('MetaModels\Attribute\Tags\MetaModelTags', $text);
     }
 }
