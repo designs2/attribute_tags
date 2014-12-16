@@ -8,8 +8,8 @@
  * PHP version 5
  * @package    MetaModels
  * @subpackage Core
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author      Stefan heimes <stefan_heimes@hotmail.com>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
@@ -18,7 +18,6 @@
 namespace MetaModels\DcGeneral\Events\MetaModels\Tags;
 
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
-use MetaModels\Attribute\Select\AbstractSelect;
 use MetaModels\Attribute\Tags\AbstractTags;
 use MetaModels\DcGeneral\Data\Model;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
