@@ -205,7 +205,7 @@ class MetaModelTags extends AbstractTags
 
         // Add some more filter rules.
         if ($usedOnly) {
-            $this->buildFilterRulesForUsedOnly($filter);
+            $this->buildFilterRulesForUsedOnly($filter, $arrIds);
         } elseif ($arrIds && is_array($arrIds)) {
             $filter->addFilterRule(new StaticIdList($arrIds));
         }
@@ -278,20 +278,23 @@ class MetaModelTags extends AbstractTags
      */
     public function buildFilterRulesForUsedOnly($filter, $idList = array())
     {
+        $params = array($this->get('id'));
+
         if (empty($idList)) {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
                 'SELECT value_id AS value
                      FROM tl_metamodel_tag_relation
                      WHERE att_id = ?
-                     GROUP BY value_id'
+                     GROUP BY value'
             // @codingStandardsIgnoreEnd
             );
 
             $arrUsedValues = $this->getDatabase()
                 ->prepare($query)
-                ->execute()
-                ->fetchEach('value_id');
+                ->execute($params)
+                ->fetchEach('value');
+
         } else {
             $query = sprintf(
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
@@ -299,15 +302,16 @@ class MetaModelTags extends AbstractTags
                     FROM tl_metamodel_tag_relation
                     WHERE att_id = ?
                       AND item_id IN (%s)
-                    GROUP BY value_id',
+                    GROUP BY value',
                 implode(',', array_fill(0, count($idList), '?')) // 1
             // @codingStandardsIgnoreEnd
             );
 
             $arrUsedValues = $this->getDatabase()
                 ->prepare($query)
-                ->execute($idList)
-                ->fetchEach('value_id');
+                ->execute(array_merge($params, $idList))
+                ->fetchEach('value');
+
         }
 
         $arrUsedValues = array_filter(
