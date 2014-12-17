@@ -37,6 +37,7 @@ use \Contao\Database\Result;
  * @package    AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Christian de la Haye <service@delahaye.de>
+ * @author     Christopher Boelter <christopher@boelter.eu>
  */
 class MetaModelTags extends AbstractTags
 {
