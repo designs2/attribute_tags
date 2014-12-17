@@ -36,6 +36,7 @@ use MetaModels\DcGeneral\Events\BaseSubscriber;
  *
  * @package AttributeTags
  * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author  Christopher Boelter <christopher@boelter.eu>
  */
 class Subscriber extends BaseSubscriber
 {
