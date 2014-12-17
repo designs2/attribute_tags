@@ -7,11 +7,12 @@
  *
  * PHP version 5
  *
- * @package    AttributeTags
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author     Stefan Heimes <stefan_heimes@hotmail.com>
- * @copyright  The MetaModels team.
- * @license    LGPL.
+ * @package     AttributeTags
+ * @author      Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author      Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author      Christopher Boelter <christopher@boelter.eu>
+ * @copyright   The MetaModels team.
+ * @license     LGPL.
  * @filesource
  */
 
@@ -36,7 +37,6 @@ use MetaModels\DcGeneral\Events\BaseSubscriber;
  *
  * @package AttributeTags
  * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author  Christopher Boelter <christopher@boelter.eu>
  */
 class Subscriber extends BaseSubscriber
 {
