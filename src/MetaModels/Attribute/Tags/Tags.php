@@ -244,7 +244,7 @@ class Tags extends AbstractTags
                 ->execute($this->get('id'));
 
             while ($objValue->next()) {
-                if (!$arrReturn[$objValue->$metaModelTableNameId]) {
+                if (!isset($arrReturn[$objValue->$metaModelTableNameId])) {
                     $arrReturn[$objValue->$metaModelTableNameId] = array();
                 }
                 $arrData = $objValue->row();
