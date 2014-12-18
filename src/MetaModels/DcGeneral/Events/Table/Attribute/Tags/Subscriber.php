@@ -7,11 +7,12 @@
  *
  * PHP version 5
  *
- * @package    AttributeTags
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author     Stefan Heimes <stefan_heimes@hotmail.com>
- * @copyright  The MetaModels team.
- * @license    LGPL.
+ * @package     AttributeTags
+ * @author      Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author      Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author      Christopher Boelter <christopher@boelter.eu>
+ * @copyright   The MetaModels team.
+ * @license     LGPL.
  * @filesource
  */
 
@@ -164,9 +165,9 @@ class Subscriber extends BaseSubscriber
         $metaModel = $this->getServiceContainer()->getFactory()->getMetaModel($metaModelName);
         $result    = array();
         
-        if($metaModel === null){
-			return $result;
-		}
+        if ($metaModel === null) {
+            return $result;
+        }
 
         foreach ($metaModel->getAttributes() as $attribute) {
             $name   = $attribute->getName();
