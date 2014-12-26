@@ -234,7 +234,12 @@ class MetaModelTags extends AbstractTags
     public function buildFilterRulesForFilterSetting($filter)
     {
         // Set Filter and co.
-        $filterSettings = FilterSettingFactory::byId($this->get('tag_filter'));
+        $filterSettings = $this
+            ->getMetaModel()
+            ->getServiceContainer()
+            ->getFilterFactory()
+            ->createCollection($this->get('tag_filter'));
+
         if ($filterSettings) {
             $values       = $_GET;
             $presets      = (array) $this->get('tag_filterparams');
