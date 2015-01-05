@@ -409,7 +409,7 @@ class Subscriber extends BaseSubscriber
                             array(
                                 new PropertyConditionChain(
                                     array(
-                                        new PropertyValueCondition('type', 'tag'),
+                                        new PropertyValueCondition('type', 'tags'),
                                         new ConditionTableNameIsMetaModel('tag_table', $mask)
                                     )
                                 )
@@ -419,7 +419,7 @@ class Subscriber extends BaseSubscriber
                         // If we want to hide the widget for metamodel tables, do so only when editing a select
                         // attribute.
                         if (!$mask) {
-                            $condition->addCondition(new NotCondition(new PropertyValueCondition('type', 'tag')));
+                            $condition->addCondition(new NotCondition(new PropertyValueCondition('type', 'tags')));
                         }
 
                         self::addCondition($property, $condition);

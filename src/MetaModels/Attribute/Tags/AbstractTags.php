@@ -10,6 +10,7 @@
  * @package   AttributeTags
  * @author    Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author    Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author    Christopher Boelter <christopher@boelter.eu>
  * @copyright The MetaModels team.
  * @license   LGPL.
  * @filesource
@@ -166,6 +167,8 @@ abstract class AbstractTags extends BaseComplex
                 'tag_id',
                 'tag_alias',
                 'tag_where',
+                'tag_filter',
+                'tag_filterparams',
                 'tag_sorting',
                 'tag_as_wizard',
                 'mandatory',
