@@ -435,6 +435,35 @@ class MetaModelTags extends AbstractTags
     }
 
     /**
+     * Loop over the Result until the item id is not matching anymore the requested item id.
+     *
+     * @param string $itemId  The item id for which the ids shall be retrieved.
+     *
+     * @param Result $allTags The database result from which the ids shall be extracted.
+     *
+     * @return array
+     */
+    private function getExistingTags($itemId, $allTags)
+    {
+        $thisExisting = array();
+
+        // Determine existing tags for this item.
+        /** @noinspection PhpUndefinedFieldInspection */
+        if (($allTags->item_id == $itemId)) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            $thisExisting[] = $allTags->value_id;
+        }
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        while ($allTags->next() && ($allTags->item_id == $itemId)) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            $thisExisting[] = $allTags->value_id;
+        }
+
+        return $thisExisting;
+    }
+
+    /**
      * Update the tag ids for a given item.
      *
      * @param int    $itemId         The item for which data shall be set for.
@@ -454,16 +483,7 @@ class MetaModelTags extends AbstractTags
         } else {
             $tagIds = array_keys($tags);
         }
-        $thisExisting = array();
-
-        // Determine existing tags for this item.
-        if (($existingTagIds->item_id == $itemId)) {
-            $thisExisting[] = $existingTagIds->value_id;
-        }
-
-        while ($existingTagIds->next() && ($existingTagIds->item_id == $itemId)) {
-            $thisExisting[] = $existingTagIds->value_id;
-        }
+        $thisExisting = $this->getExistingTags($itemId, $existingTagIds);
 
         // First pass, delete all not mentioned anymore.
         $valuesToRemove = array_diff($thisExisting, $tagIds);
