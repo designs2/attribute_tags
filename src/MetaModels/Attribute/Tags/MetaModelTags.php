@@ -116,9 +116,62 @@ class MetaModelTags extends AbstractTags
     }
 
     /**
-     * {@inheritdoc}
+     * Translate the values from the widget.
+     *
+     * @param array $varValue The values.
+     *
+     * @return array
+     *
+     * @throws \RuntimeException When values could not be translated.
      */
-    // @codingStandardsIgnoreStart - ignore unused parameter $intId.
+    protected function getValuesFromWidget($varValue)
+    {
+        $model     = $this->getTagMetaModel();
+        $alias     = $this->getAliasColumn();
+        $attribute = $model->getAttribute($alias);
+        $valueIds  = array();
+
+        if ($attribute) {
+            // It is an attribute, we may search for it.
+            foreach ($varValue as $value) {
+                $ids = $attribute->searchFor($value);
+                if ($ids) {
+                    $valueIds = array_merge($valueIds, $ids);
+                }
+            }
+        } else {
+            // Must be a system column then.
+            // Special case first, the id is our alias, easy way out.
+            if ($alias === 'id') {
+                $valueIds = $varValue;
+            } else {
+                $result = $this->getDatabase()
+                    ->prepare(
+                        sprintf(
+                            'SELECT v.id FROM %1$s AS v WHERE v.%2$s=?',
+                            $model,
+                            $alias
+                        )
+                    )
+                    ->execute($varValue);
+
+                /** @noinspection PhpUndefinedFieldInspection */
+                if (!$result->numRows) {
+                    throw new \RuntimeException('Could not translate value ' . var_export($varValue, true));
+                }
+
+                $valueIds = $result->fetchEach('id');
+            }
+        }
+
+        return $this->getValuesById($valueIds);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException When invalid values are encountered.
+     */
     public function widgetToValue($varValue, $intId)
     {
         if ($this->isTreePicker() && is_string($varValue)) {
@@ -133,47 +186,8 @@ class MetaModelTags extends AbstractTags
             throw new \InvalidArgumentException('Incorrect values encountered ' . var_export($varValue, true));
         }
 
-        $model     = $this->getTagMetaModel();
-        $alias     = $this->getAliasColumn();
-        $attribute = $model->getAttribute($alias);
-        $valueId   = array();
-
-        if ($attribute) {
-            // It is an attribute, we may search for it.
-            foreach($varValue as $value)
-            {
-                $ids = $attribute->searchFor($value);
-                if ($ids) {
-                    $valueId = array_merge($valueId, $ids);
-                }
-            }
-        } else {
-            // Must be a system column then.
-            // Special case first, the id is our alias, easy way out.
-            if ($alias === 'id') {
-                $valueId = $varValue;
-            } else {
-                $result = $this->getDatabase()
-                    ->prepare(
-                        sprintf(
-                            'SELECT v.id FROM %1$s AS v WHERE v.%2$s=?',
-                            $model,
-                            $alias
-                        )
-                    )
-                    ->execute($varValue);
-
-                if (!$result->numRows) {
-                    throw new \RuntimeException('Could not translate value ' . var_export($varValue, true));
-                }
-
-                $valueId = $result->fetchEach('id');
-            }
-        }
-
-        return $this->getValuesById($valueId);
+        return $this->getValuesFromWidget($varValue);
     }
-    // @codingStandardsIgnoreEnd
 
     /**
      * {@inheritdoc}
