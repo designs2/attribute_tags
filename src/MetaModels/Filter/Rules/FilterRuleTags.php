@@ -70,7 +70,7 @@ class FilterRuleTags extends FilterRule
 
         $arrValues = is_array($this->value) ? $this->value : explode(',', $this->value);
 
-        $objDB = \Database::getInstance();
+        $objDB = $this->objAttribute->getMetaModel()->getServiceContainer()->getDatabase();
 
         if ($strColNameAlias) {
             $objSelectIds = $objDB
@@ -105,7 +105,11 @@ class FilterRuleTags extends FilterRule
             return array();
         }
 
-        $objMatches = \Database::getInstance()
+        $objMatches = $this
+            ->objAttribute
+            ->getMetaModel()
+            ->getServiceContainer()
+            ->getDatabase()
             ->prepare(
                 'SELECT item_id as id
                 FROM tl_metamodel_tag_relation
