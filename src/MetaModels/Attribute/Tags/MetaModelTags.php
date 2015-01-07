@@ -392,7 +392,7 @@ class MetaModelTags extends AbstractTags
                         // @codingStandardsIgnoreEnd
                     )
                 )
-                ->executeUncached(array_merge($arrIds, array($this->get('id'))));
+                ->execute(array_merge($arrIds, array($this->get('id'))));
 
             $valueIds     = array();
             $referenceIds = array();
