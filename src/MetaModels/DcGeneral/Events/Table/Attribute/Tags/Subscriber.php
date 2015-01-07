@@ -53,7 +53,7 @@ class Subscriber extends BaseSubscriber
         $this
             ->addListener(
                 GetPropertyOptionsEvent::NAME,
-                array($this, 'getTableNames')
+                array($this, 'handleTableNames')
             )
             ->addListener(
                 GetPropertyOptionsEvent::NAME,
@@ -109,7 +109,7 @@ class Subscriber extends BaseSubscriber
     }
 
     /**
-     * Retrieve all database table names.
+     * Retrieve all database table names and store them into the event.
      *
      * @param GetPropertyOptionsEvent $event The event.
      *
@@ -118,13 +118,8 @@ class Subscriber extends BaseSubscriber
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    public function getTableNames(GetPropertyOptionsEvent $event)
+    protected function getTableNames(GetPropertyOptionsEvent $event)
     {
-        if (($event->getEnvironment()->getDataDefinition()->getName() !== 'tl_metamodel_attribute')
-            || ($event->getPropertyName() !== 'tag_table')) {
-            return;
-        }
-
         $database     = $this->getServiceContainer()->getDatabase();
         $sqlTable     = $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table_type']['sql-table'];
         $translated   = $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_table_type']['translated'];
@@ -151,6 +146,23 @@ class Subscriber extends BaseSubscriber
         }
 
         $event->setOptions($result);
+    }
+
+    /**
+     * Retrieve all database table names.
+     *
+     * @param GetPropertyOptionsEvent $event The event.
+     *
+     * @return void
+     */
+    public function handleTableNames(GetPropertyOptionsEvent $event)
+    {
+        if (($event->getEnvironment()->getDataDefinition()->getName() !== 'tl_metamodel_attribute')
+            || ($event->getPropertyName() !== 'tag_table')) {
+            return;
+        }
+
+        $this->getTableNames($event);
     }
 
     /**
@@ -212,26 +224,15 @@ class Subscriber extends BaseSubscriber
      *
      * @param GetPropertyOptionsEvent $event The event.
      *
+     * @param string                  $table The table to retrieve the columns from.
+     *
      * @return void
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    public function getColumnNames(GetPropertyOptionsEvent $event)
+    public function handleColumnNames(GetPropertyOptionsEvent $event, $table)
     {
-        if (($event->getEnvironment()->getDataDefinition()->getName() !== 'tl_metamodel_attribute')
-            || (
-                ($event->getPropertyName() !== 'tag_column')
-                && ($event->getPropertyName() !== 'tag_alias')
-                && ($event->getPropertyName() !== 'tag_sorting')
-            )
-        ) {
-            return;
-        }
-
-        $model = $event->getModel();
-        $table = $model->getProperty('tag_table');
-
         if (substr($table, 0, 3) === 'mm_') {
             $attributes = self::getAttributeNamesFrom($table);
             asort($attributes);
@@ -255,6 +256,31 @@ class Subscriber extends BaseSubscriber
             asort($result);
             $event->setOptions($result);
         }
+    }
+
+    /**
+     * Retrieve all column names for the current selected table.
+     *
+     * @param GetPropertyOptionsEvent $event The event.
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
+     */
+    public function getColumnNames(GetPropertyOptionsEvent $event)
+    {
+        if (($event->getEnvironment()->getDataDefinition()->getName() !== 'tl_metamodel_attribute')
+            || (
+                ($event->getPropertyName() !== 'tag_column')
+                && ($event->getPropertyName() !== 'tag_alias')
+                && ($event->getPropertyName() !== 'tag_sorting')
+            )
+        ) {
+            return;
+        }
+
+        $this->handleColumnNames($event, $event->getModel()->getProperty('tag_table'));
     }
 
     /**
