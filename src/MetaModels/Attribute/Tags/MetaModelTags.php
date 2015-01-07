@@ -23,9 +23,7 @@
 
 namespace MetaModels\Attribute\Tags;
 
-use MetaModels\Factory as MetaModelFactory;
 use MetaModels\Filter\Rules\StaticIdList;
-use MetaModels\Filter\Setting\Factory as FilterSettingFactory;
 use MetaModels\Filter\IFilter;
 use MetaModels\IItem;
 use MetaModels\IItems;
@@ -61,7 +59,8 @@ class MetaModelTags extends AbstractTags
     protected function getTagMetaModel()
     {
         if (empty($this->objSelectMetaModel)) {
-            $this->objSelectMetaModel = MetaModelFactory::byTableName($this->getTagSource());
+            $this->objSelectMetaModel =
+                $this->getMetaModel()->getServiceContainer()->getFactory()->getMetaModel($this->getTagSource());
         }
 
         return $this->objSelectMetaModel;
