@@ -402,8 +402,11 @@ class MetaModelTags extends AbstractTags
             $referenceIds = array();
 
             while ($rows->next()) {
-                $valueIds[$rows->id][] = $rows->value;
-                $referenceIds[]        = $rows->value;
+                /** @noinspection PhpUndefinedFieldInspection */
+                $value = $rows->value;
+                /** @noinspection PhpUndefinedFieldInspection */
+                $valueIds[$rows->id][] = $value;
+                $referenceIds[]        = $value;
             }
 
             $filter = $metaModel->getEmptyFilter();
