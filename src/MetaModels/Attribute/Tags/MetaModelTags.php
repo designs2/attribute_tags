@@ -165,6 +165,40 @@ class MetaModelTags extends AbstractTags
     }
 
     /**
+     * Calculate the amount how often each value has been assigned.
+     *
+     * @param IItems $items       The item list containing the values.
+     *
+     * @param array  $amountArray The target array to where the counters shall be stored to.
+     *
+     * @return void
+     */
+    protected function calculateFilterOptionsCount($items, &$amountArray)
+    {
+        $ids = array();
+        foreach ($items as $item) {
+            $ids[] = $item->get('id');
+        }
+
+        $counts = $this
+            ->getDatabase()
+            ->prepare(
+                sprintf(
+                    'SELECT COUNT(value_id) AS amount FROM %1$s WHERE att_id="%2$s" AND value_id IN (%3$s)',
+                    $this->getReferenceTable(),
+                    $this->get('id'),
+                    implode(',', array_fill(0, count($ids), '?'))
+                )
+            )
+            ->execute($ids);
+
+        while ($counts->next()) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            $amountArray[$counts->value_id] = $counts->amount;
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * Fetch filter options from foreign table.
@@ -204,6 +238,10 @@ class MetaModelTags extends AbstractTags
         // Reset language.
         if (TL_MODE == 'BE') {
             $GLOBALS['TL_LANGUAGE'] = $strCurrentLanguage;
+        }
+
+        if ($arrCount !== null) {
+            $this->calculateFilterOptionsCount($objItems, $arrCount);
         }
 
         return $this->convertItemsToFilterOptions($objItems, $strDisplayValue, $this->getAliasColumn());
