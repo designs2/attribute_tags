@@ -22,6 +22,8 @@
 
 namespace MetaModels\Attribute\Tags;
 
+use Contao\Database\Result;
+
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
  *
@@ -89,6 +91,109 @@ class Tags extends AbstractTags
     // @codingStandardsIgnoreEnd
 
     /**
+     * Retrieve the filter options for items with the given ids.
+     *
+     * @param array $arrIds   The ids for which the options shall be retrieved.
+     *
+     * @param bool  $usedOnly Flag if only used options shall be retrieved.
+     *
+     * @return Result
+     */
+    protected function retrieveFilterOptionsForIds($arrIds, $usedOnly)
+    {
+        if ($usedOnly) {
+            $sqlQuery = '
+                    SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
+                    FROM %1$s
+                    LEFT JOIN tl_metamodel_tag_relation ON (
+                        (tl_metamodel_tag_relation.att_id=?)
+                        AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
+                    )
+                    WHERE (tl_metamodel_tag_relation.item_id IN (%3$s)%5$s)
+                    GROUP BY %1$s.%2$s
+                    ORDER BY %1$s.%4$s
+                ';
+        } else {
+            $sqlQuery = '
+                    SELECT COUNT(rel.value_id) as mm_count, %1$s.*
+                    FROM %1$s
+                    LEFT JOIN tl_metamodel_tag_relation as rel ON (
+                        (rel.att_id=?) AND (rel.value_id=%1$s.%2$s)
+                    )
+                    WHERE %1$s.%2$s IN (%3$s)%5$s
+                    GROUP BY %1$s.%2$s
+                    ORDER BY %1$s.%4$s';
+        }
+
+        return $this
+            ->getDatabase()
+            ->prepare(
+                sprintf(
+                    $sqlQuery,
+                    // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+                    $this->getTagSource(),                                                    // 1
+                    $this->getIdColumn(),                                                     // 2
+                    implode(',', $arrIds),                                                    // 3
+                    $this->getSortingColumn(),                                                // 4
+                    ($this->getWhereColumn() ? ' AND (' . $this->getWhereColumn() . ')' : '') // 5
+                // @codingStandardsIgnoreEnd
+                )
+            )
+            ->execute($this->get('id'));
+    }
+
+    /**
+     * Retrieve the filter options for items with the given ids.
+     *
+     * @param bool $usedOnly Flag if only used options shall be retrieved.
+     *
+     * @return Result
+     */
+    protected function retrieveFilterOptionsWithoutIds($usedOnly)
+    {
+        if ($usedOnly) {
+            $sqlQuery = '
+                    SELECT COUNT(%1$s.%3$s) as mm_count, %1$s.*
+                    FROM %1$s
+                    INNER JOIN tl_metamodel_tag_relation as rel
+                    ON (
+                        (rel.att_id="%4$s") AND (rel.value_id=%1$s.%3$s)
+                    )
+                    WHERE rel.att_id=%4$s'
+                . ($this->getWhereColumn() ? ' AND %5$s' : '') . '
+                    GROUP BY %1$s.%3$s
+                    ORDER BY %1$s.%2$s';
+        } else {
+            $sqlQuery = '
+                    SELECT COUNT(rel.value_id) as mm_count, %1$s.*
+                    FROM %1$s
+                    LEFT JOIN tl_metamodel_tag_relation as rel
+                    ON (
+                        (rel.att_id="%4$s") AND (rel.value_id=%1$s.%3$s)
+                    )'
+                . ($this->getWhereColumn() ? ' WHERE %5$s' : '') . '
+                    GROUP BY %1$s.%3$s
+                    ORDER BY %1$s.%2$s';
+        }
+
+        return $this
+            ->getDatabase()
+            ->prepare(
+                sprintf(
+                    $sqlQuery,
+                    // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+                    $this->getTagSource(),       // 1
+                    $this->getSortingColumn(),   // 2
+                    $this->getIdColumn(),        // 3
+                    $this->get('id'),            // 4
+                    $this->getWhereColumn()      // 5
+                // @codingStandardsIgnoreEnd
+                )
+            )
+            ->execute();
+    }
+
+    /**
      * {@inheritdoc}
      *
      * Fetch filter options from foreign table.
@@ -96,105 +201,34 @@ class Tags extends AbstractTags
      */
     public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
     {
-        $strTableName    = $this->getTagSource();
-        $strColNameId    = $this->getIdColumn();
-        $strSortColumn   = $this->getSortingColumn() ?: $strColNameId;
-        $strColNameWhere = ($this->getWhereColumn() ? html_entity_decode($this->getWhereColumn()) : false);
-        $objDB           = $this->getDatabase();
-
-        $arrReturn = array();
-
-        if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId && $strSortColumn) {
-            $strColNameValue = $this->getValueColumn();
-            $strColNameAlias = $this->getAliasColumn();
-
-            if ($arrIds) {
-                if ($usedOnly) {
-                    $strSQL = '
-                        SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.*
-                        FROM %1$s
-                        LEFT JOIN tl_metamodel_tag_relation ON (
-                            (tl_metamodel_tag_relation.att_id=?)
-                            AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
-                        )
-                        WHERE (tl_metamodel_tag_relation.item_id IN (%3$s)%5$s)
-                        GROUP BY %1$s.%2$s
-                        ORDER BY %1$s.%4$s
-                    ';
-                } else {
-                    $strSQL = '
-                        SELECT COUNT(rel.value_id) as mm_count, %1$s.*
-                        FROM %1$s
-                        LEFT JOIN tl_metamodel_tag_relation as rel ON (
-                            (rel.att_id=?) AND (rel.value_id=%1$s.%2$s)
-                        )
-                        WHERE %1$s.%2$s IN (%3$s)%5$s
-                        GROUP BY %1$s.%2$s
-                        ORDER BY %1$s.%4$s';
-                }
-
-                $objValue = $objDB->prepare(
-                    sprintf(
-                        $strSQL,
-                        // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                        $strTableName,                                              // 1
-                        $strColNameId,                                              // 2
-                        implode(',', $arrIds),                                      // 3
-                        $strSortColumn,                                             // 4
-                        ($strColNameWhere ? ' AND (' . $strColNameWhere . ')' : '') // 5
-                    // @codingStandardsIgnoreEnd
-                    )
-                )->execute($this->get('id'));
-            } else {
-                if ($usedOnly) {
-                    $strSQL = '
-                        SELECT COUNT(%1$s.%3$s) as mm_count, %1$s.*
-                        FROM %1$s
-                        INNER JOIN tl_metamodel_tag_relation as rel
-                        ON (
-                            (rel.att_id="%4$s") AND (rel.value_id=%1$s.%3$s)
-                        )
-                        WHERE rel.att_id=%4$s'
-                        . ($strColNameWhere ? ' AND %5$s' : '') . '
-                        GROUP BY %1$s.%3$s
-                        ORDER BY %1$s.%2$s';
-                } else {
-                    $strSQL = '
-                        SELECT COUNT(rel.value_id) as mm_count, %1$s.*
-                        FROM %1$s
-                        LEFT JOIN tl_metamodel_tag_relation as rel
-                        ON (
-                            (rel.att_id="%4$s") AND (rel.value_id=%1$s.%3$s)
-                        )'
-                        . ($strColNameWhere ? ' WHERE %5$s' : '') . '
-                        GROUP BY %1$s.%3$s
-                        ORDER BY %1$s.%2$s';
-                }
-
-                $objValue = $objDB->prepare(
-                    sprintf(
-                        $strSQL,
-                        // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                        $strTableName,    // 1
-                        $strSortColumn,   // 2
-                        $strColNameId,    // 3
-                        $this->get('id'), // 4
-                        $strColNameWhere  // 5
-                    // @codingStandardsIgnoreEnd
-                    )
-                )->execute();
-            }
-
-            while ($objValue->next()) {
-                if (is_array($arrCount)) {
-                    $arrCount[$objValue->$strColNameAlias] = $objValue->mm_count;
-                }
-
-                $arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
-            }
+        if (!(
+            $this->getTagSource()
+            && $this->getDatabase()->tableExists($this->getTagSource())
+            && $this->getIdColumn()
+            && $this->getSortingColumn())
+        ) {
+            return array();
         }
 
-        return $arrReturn;
+        if ($arrIds) {
+            $objValue = $this->retrieveFilterOptionsForIds($arrIds, $usedOnly, $arrCount);
+        } else {
+            $objValue = $this->retrieveFilterOptionsWithoutIds($usedOnly);
+        }
+
+        $result      = array();
+        $valueColumn = $this->getValueColumn();
+        $aliasColumn = $this->getAliasColumn();
+        while ($objValue->next()) {
+            if ($arrCount !== null) {
+                /** @noinspection PhpUndefinedFieldInspection */
+                $arrCount[$objValue->$aliasColumn] = $objValue->mm_count;
+            }
+
+            $result[$objValue->$aliasColumn] = $objValue->$valueColumn;
+        }
+
+        return $result;
     }
 
     /**
