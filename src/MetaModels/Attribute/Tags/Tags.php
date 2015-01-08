@@ -22,8 +22,6 @@
 
 namespace MetaModels\Attribute\Tags;
 
-use Contao\Database\Result;
-
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
  *
@@ -52,35 +50,26 @@ class Tags extends AbstractTags
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \RuntimeException When values could not be translated.
      */
-    // @codingStandardsIgnoreStart - ignore unused parameter $intId.
-    public function widgetToValue($varValue, $intId)
+    protected function getValuesFromWidget($varValue)
     {
-        // If we are in tree mode, we got a comma separate list.
-        if ($this->isTreePicker() && !empty($varValue) && !is_array($varValue)) {
-            $varValue = explode(',', $varValue);
-        }
-
-        if ((!is_array($varValue)) || empty($varValue)) {
-            return array();
-        }
-
-        $arrSearch = array();
         $arrParams = array();
         foreach ($varValue as $strValue) {
-            $arrSearch[] = '?';
             $arrParams[] = $strValue;
         }
-        $objDB    = \Database::getInstance();
-        $objValue = $objDB
+
+        $objValue = $this
+            ->getDatabase()
             ->prepare(
-                sprintf('
-                    SELECT %1$s.*
+                sprintf(
+                    'SELECT %1$s.*
                     FROM %1$s
                     WHERE %2$s IN (%3$s)',
                     $this->getTagSource(),
                     $this->getAliasColumn(),
-                    implode(',', $arrSearch)
+                    implode(',', array_fill(0, count($arrParams), '?'))
                 )
             )
             ->execute($arrParams);
@@ -256,135 +245,6 @@ class Tags extends AbstractTags
     }
 
     /**
-     * Update the tag ids for a given item.
-     *
-     * @param int    $itemId         The item for which data shall be set for.
-     *
-     * @param array  $tags           The tag ids that shall be set for the item.
-     *
-     * @param Result $existingTagIds The sql result containing the tag ids present in the database.
-     *
-     * @return array
-     */
-    protected function setDataForItem($itemId, $tags, $existingTagIds)
-    {
-        $objDB = $this->getDatabase();
-
-        if ($tags === null) {
-            $tagIds = array();
-        } else {
-            $tagIds = array_map('intval', array_keys($tags));
-        }
-        $thisExisting = array();
-
-        // Determine existing tags for this item.
-        if (($existingTagIds->item_id == $itemId)) {
-            $thisExisting[] = $existingTagIds->value_id;
-        }
-        while ($existingTagIds->next() && ($existingTagIds->item_id == $itemId)) {
-            $thisExisting[] = $existingTagIds->value_id;
-        }
-
-        // First pass, delete all not mentioned anymore.
-        $valuesToRemove = array_diff($thisExisting, $tagIds);
-        if ($valuesToRemove) {
-            $objDB
-                ->prepare(
-                    sprintf(
-                        'DELETE FROM tl_metamodel_tag_relation
-                        WHERE
-                        att_id=?
-                        AND item_id=?
-                        AND value_id IN (%s)',
-                        implode(',', $valuesToRemove)
-                    )
-                )
-                ->execute($this->get('id'), $itemId);
-        }
-
-        // Second pass, add all new values in a row.
-        $valuesToAdd  = array_diff($tagIds, $thisExisting);
-        $insertValues = array();
-        if ($valuesToAdd) {
-            foreach ($valuesToAdd as $valueId) {
-                $insertValues[] = sprintf(
-                    '(%s,%s,%s,%s)',
-                    $this->get('id'),
-                    $itemId,
-                    (int) $tags[$valueId]['tag_value_sorting'],
-                    $valueId
-                );
-            }
-        }
-
-        // Third pass, update all sorting values.
-        $valuesToUpdate = array_diff($tagIds, $valuesToAdd);
-        if ($valuesToUpdate) {
-            foreach ($valuesToUpdate as $valueId) {
-                if (!array_key_exists('tag_value_sorting', $tags[$valueId])) {
-                    continue;
-                }
-
-                $objDB
-                    ->prepare(
-                        'UPDATE tl_metamodel_tag_relation
-                        SET value_sorting = ' . (int) $tags[$valueId]['tag_value_sorting'] . '
-                        WHERE
-                        att_id=?
-                        AND item_id=?
-                        AND value_id=?'
-                    )
-                    ->execute($this->get('id'), $itemId, $valueId);
-            }
-        }
-
-        return $insertValues;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDataFor($arrValues)
-    {
-        $database = \Database::getInstance();
-        $itemIds  = array_map('intval', array_keys($arrValues));
-        sort($itemIds);
-        // Load all existing tags for all items to be updated, keep the ordering to item Id
-        // so we can benefit from the batch deletion and insert algorithm.
-        $existingTagIds = $database
-            ->prepare(
-                sprintf(
-                    'SELECT * FROM tl_metamodel_tag_relation
-                    WHERE
-                    att_id=?
-                    AND item_id IN (%1$s)
-                    ORDER BY item_id ASC',
-                    implode(',', $itemIds)
-                )
-            )
-            ->execute($this->get('id'));
-
-        // Now loop over all items and update the values for them.
-        // NOTE: we can not loop over the original array, as the item ids are not neccessarily
-        // sorted ascending by item id.
-        $insertValues = array();
-        foreach ($itemIds as $itemId) {
-            $insertValues = array_merge(
-                $insertValues,
-                $this->setDataForItem($itemId, $arrValues[$itemId], $existingTagIds)
-            );
-        }
-
-        if ($insertValues) {
-            $database->execute(
-                'INSERT INTO tl_metamodel_tag_relation
-                (att_id, item_id, value_sorting, value_id)
-                VALUES ' . implode(',', $insertValues)
-            );
-        }
-    }
-
-    /**
      * Convert the passed values to a list of value ids.
      *
      * @param string[] $values The values to convert.
@@ -398,7 +258,8 @@ class Tags extends AbstractTags
         $strColNameAlias = $this->getAliasColumn();
 
         if ($strColNameAlias) {
-            $objSelectIds = $this->getDatabase()
+            $objSelectIds = $this
+                ->getDatabase()
                 ->prepare(sprintf(
                     'SELECT %s FROM %s WHERE %s IN (%s)',
                     $strColNameId,
@@ -406,7 +267,7 @@ class Tags extends AbstractTags
                     $strColNameAlias,
                     implode(',', array_fill(0, count($values), '?'))
                 ))
-                ->executeUncached($values);
+                ->execute($values);
 
             $values = $objSelectIds->fetchEach($strColNameId);
         } else {

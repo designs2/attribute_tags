@@ -18,6 +18,7 @@
 
 namespace MetaModels\Attribute\Tags;
 
+use Contao\Database\Result;
 use MetaModels\Attribute\BaseComplex;
 use MetaModels\Render\Template;
 use MetaModels\Filter\Rules\FilterRuleTags;
@@ -45,7 +46,7 @@ abstract class AbstractTags extends BaseComplex
      */
     protected function getDatabase()
     {
-        return \Database::getInstance();
+        return $this->getMetaModel()->getServiceContainer()->getDatabase();
     }
 
     /**
@@ -131,7 +132,7 @@ abstract class AbstractTags extends BaseComplex
      */
     protected function getWhereColumn()
     {
-        return $this->get('tag_where');
+        return $this->get('tag_where') ? html_entity_decode($this->get('tag_where')) : null;
     }
 
     /**
@@ -210,12 +211,191 @@ abstract class AbstractTags extends BaseComplex
     }
 
     /**
+     * Translate the values from the widget.
+     *
+     * @param array $varValue The values.
+     *
+     * @return array
+     */
+    abstract protected function getValuesFromWidget($varValue);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function widgetToValue($varValue, $intId)
+    {
+        // If we are in tree mode, we got a comma separate list.
+        if ($this->isTreePicker() && !empty($varValue) && !is_array($varValue)) {
+            $varValue = explode(',', $varValue);
+        }
+
+        if ((!is_array($varValue)) || empty($varValue)) {
+            return array();
+        }
+
+        return $this->getValuesFromWidget($varValue);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function searchFor($strPattern)
     {
         $objFilterRule = new FilterRuleTags($this, $strPattern);
         return $objFilterRule->getMatchingIds();
+    }
+
+    /**
+     * Loop over the Result until the item id is not matching anymore the requested item id.
+     *
+     * @param string $itemId  The item id for which the ids shall be retrieved.
+     *
+     * @param Result $allTags The database result from which the ids shall be extracted.
+     *
+     * @return array
+     */
+    protected function getExistingTags($itemId, $allTags)
+    {
+        $thisExisting = array();
+
+        // Determine existing tags for this item.
+        /** @noinspection PhpUndefinedFieldInspection */
+        if (($allTags->item_id == $itemId)) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            $thisExisting[] = $allTags->value_id;
+        }
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        while ($allTags->next() && ($allTags->item_id == $itemId)) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            $thisExisting[] = $allTags->value_id;
+        }
+
+        return $thisExisting;
+    }
+
+    /**
+     * Update the tag ids for a given item.
+     *
+     * @param int    $itemId         The item for which data shall be set for.
+     *
+     * @param array  $tags           The tag ids that shall be set for the item.
+     *
+     * @param Result $existingTagIds The sql result containing the tag ids present in the database.
+     *
+     * @return array
+     */
+    private function setDataForItem($itemId, $tags, $existingTagIds)
+    {
+        $database = $this->getDatabase();
+
+        if ($tags === null) {
+            $tagIds = array();
+        } else {
+            $tagIds = array_keys($tags);
+        }
+        $thisExisting = $this->getExistingTags($itemId, $existingTagIds);
+
+        // First pass, delete all not mentioned anymore.
+        $valuesToRemove = array_diff($thisExisting, $tagIds);
+        if ($valuesToRemove) {
+            $database
+                ->prepare(
+                    sprintf(
+                        'DELETE FROM tl_metamodel_tag_relation
+                        WHERE att_id=?
+                        AND item_id=?
+                        AND value_id IN (%s)',
+                        implode(',', array_fill(0, count($valuesToRemove), '?'))
+                    )
+                )
+                ->execute(array_merge(array($this->get('id'), $itemId), $valuesToRemove));
+        }
+
+        // Second pass, add all new values in a row.
+        $valuesToAdd  = array_diff($tagIds, $thisExisting);
+        $insertValues = array();
+        if ($valuesToAdd) {
+            foreach ($valuesToAdd as $valueId) {
+                $insertValues[] = sprintf(
+                    '(%s,%s,%s,%s)',
+                    $this->get('id'),
+                    $itemId,
+                    (int) $tags[$valueId]['tag_value_sorting'],
+                    $valueId
+                );
+            }
+        }
+
+        // Third pass, update all sorting values.
+        $valuesToUpdate = array_diff($tagIds, $valuesToAdd);
+        if ($valuesToUpdate) {
+            foreach ($valuesToUpdate as $valueId) {
+                if (!array_key_exists('tag_value_sorting', $tags[$valueId])) {
+                    continue;
+                }
+
+                $database
+                    ->prepare(
+                        'UPDATE tl_metamodel_tag_relation
+                        SET value_sorting = ' . (int) $tags[$valueId]['tag_value_sorting'] . '
+                        WHERE att_id=?
+                        AND item_id=?
+                        AND value_id=?'
+                    )
+                    ->execute($this->get('id'), $itemId, $valueId);
+            }
+        }
+
+        return $insertValues;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDataFor($arrValues)
+    {
+        if (!($this->getTagSource() && $this->getValueColumn())) {
+            return;
+        }
+
+        $database = $this->getDatabase();
+        $itemIds  = array_keys($arrValues);
+        sort($itemIds);
+
+        // Load all existing tags for all items to be updated, keep the ordering to item Id
+        // so we can benefit from the batch deletion and insert algorithm.
+        $existingTagIds = $database
+            ->prepare(
+                sprintf(
+                    'SELECT * FROM %1$s
+                    WHERE att_id=?
+                    AND item_id IN (%2$s)
+                    ORDER BY item_id ASC',
+                    $this->getReferenceTable(),
+                    implode(',', array_fill(0, count($itemIds), '?'))
+                )
+            )
+            ->execute(array_merge(array($this->get('id')), $itemIds));
+
+        // Now loop over all items and update the values for them.
+        // NOTE: we can not loop over the original array, as the item ids are not neccessarily
+        // sorted ascending by item id.
+        $insertValues = array();
+        foreach ($itemIds as $itemId) {
+            $insertValues = array_merge(
+                $insertValues,
+                $this->setDataForItem($itemId, $arrValues[$itemId], $existingTagIds)
+            );
+        }
+
+        if ($insertValues) {
+            $database->execute(
+                'INSERT INTO tl_metamodel_tag_relation
+                (att_id, item_id, value_sorting, value_id)
+                VALUES ' . implode(',', $insertValues)
+            );
+        }
     }
 
     /**
