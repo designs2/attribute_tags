@@ -402,7 +402,6 @@ class MetaModelTags extends AbstractTags
                         FROM tl_metamodel_tag_relation
                         WHERE tl_metamodel_tag_relation.item_id IN (%1$s)
                         AND att_id = ?
-                        GROUP BY value_id
                         ORDER BY tl_metamodel_tag_relation.value_sorting',
                         // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
                         implode(',', array_fill(0, count($arrIds), '?')) // 1
