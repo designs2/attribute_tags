@@ -11,6 +11,7 @@
  * @author    Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author    Stefan Heimes <stefan_heimes@hotmail.com>
  * @author    Andreas Isaak <info@andreas-isaak.de>
+ * @author    Christopher Boelter <christopher@boelter.eu>
  * @copyright The MetaModels team.
  * @license   LGPL.
  * @filesource
@@ -21,6 +22,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id'
     'presentation' => array
     (
         'tl_class',
+        'submitOnChange',
         'tag_as_wizard'
     ),
     'functions'    => array

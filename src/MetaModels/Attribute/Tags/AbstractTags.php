@@ -173,6 +173,7 @@ abstract class AbstractTags extends BaseComplex
                 'tag_sorting',
                 'tag_as_wizard',
                 'mandatory',
+                'submitOnChange',
                 'filterable',
                 'searchable',
             )
