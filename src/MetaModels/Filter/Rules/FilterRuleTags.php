@@ -65,8 +65,7 @@ class FilterRuleTags extends FilterRule
     public function sanitizeValue()
     {
         $strTableNameId  = $this->objAttribute->get('tag_table');
-        // The tag_id field is empty if the source of the attribute is from type metamodel
-        $strColNameId    = $this->objAttribute->get('tag_id') ?:'id';
+        $strColNameId    = $this->objAttribute->get('tag_id') ?: 'id';
         $strColNameAlias = $this->objAttribute->get('tag_alias');
 
         $arrValues = is_array($this->value) ? $this->value : explode(',', $this->value);
