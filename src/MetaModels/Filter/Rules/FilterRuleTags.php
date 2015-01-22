@@ -14,6 +14,7 @@
  * @author     Christian de la Haye <service@delahaye.de>
  * @author     David Maack <david.maack@arcor.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Martin Treml <github@r2pi.net>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
