@@ -218,7 +218,7 @@ class MetaModelTags extends AbstractTags
 
         // Add some more filter rules.
         if ($usedOnly) {
-            $this->buildFilterRulesForUsedOnly($filter, $idList);
+            $this->buildFilterRulesForUsedOnly($filter, $idList ? $idList : array());
         } elseif ($idList && is_array($idList)) {
             $filter->addFilterRule(new StaticIdList($idList));
         }
