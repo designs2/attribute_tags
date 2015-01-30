@@ -68,7 +68,7 @@ class MetaModelTags extends AbstractTags
     /**
      * Retrieve the values with the given ids.
      *
-     * @param int[] $valueIds The ids of the values to retrieve.
+     * @param string[] $valueIds The ids of the values to retrieve.
      *
      * @return array
      */
