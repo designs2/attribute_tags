@@ -202,24 +202,14 @@ class MetaModelTags extends AbstractTags
      * {@inheritdoc}
      *
      * Fetch filter options from foreign table.
-     *
-     * @SuppressWarnings(PHPMD.Superglobals)
-     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
     public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
-        $strDisplayValue    = $this->getValueColumn();
-        $strSortingValue    = $this->getSortingColumn();
-        $strCurrentLanguage = null;
+        $strDisplayValue = $this->getValueColumn();
+        $strSortingValue = $this->getSortingColumn();
 
         if (!($this->getTagMetaModel() && $strDisplayValue)) {
             return array();
-        }
-
-        // Change language.
-        if (TL_MODE == 'BE') {
-            $strCurrentLanguage     = $GLOBALS['TL_LANGUAGE'];
-            $GLOBALS['TL_LANGUAGE'] = $this->getMetaModel()->getActiveLanguage();
         }
 
         $filter = $this->getTagMetaModel()->getEmptyFilter();
@@ -234,11 +224,6 @@ class MetaModelTags extends AbstractTags
         }
 
         $objItems = $this->getTagMetaModel()->findByFilter($filter, $strSortingValue);
-
-        // Reset language.
-        if (TL_MODE == 'BE') {
-            $GLOBALS['TL_LANGUAGE'] = $strCurrentLanguage;
-        }
 
         if ($arrCount !== null) {
             $this->calculateFilterOptionsCount($objItems, $arrCount);
