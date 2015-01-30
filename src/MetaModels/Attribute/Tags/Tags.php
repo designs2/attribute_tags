@@ -199,7 +199,7 @@ class Tags extends AbstractTags
      * Fetch filter options from foreign table.
      *
      */
-    public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
+    public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
         if (!(
             $this->getTagSource()
@@ -210,8 +210,8 @@ class Tags extends AbstractTags
             return array();
         }
 
-        if ($arrIds) {
-            $objValue = $this->retrieveFilterOptionsForIds($arrIds, $usedOnly, $arrCount);
+        if ($idList) {
+            $objValue = $this->retrieveFilterOptionsForIds($idList, $usedOnly, $arrCount);
         } else {
             $objValue = $this->retrieveFilterOptionsWithoutIds($usedOnly);
         }

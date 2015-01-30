@@ -206,7 +206,7 @@ class MetaModelTags extends AbstractTags
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
+    public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
         $strDisplayValue    = $this->getValueColumn();
         $strSortingValue    = $this->getSortingColumn();
@@ -228,9 +228,9 @@ class MetaModelTags extends AbstractTags
 
         // Add some more filter rules.
         if ($usedOnly) {
-            $this->buildFilterRulesForUsedOnly($filter, $arrIds);
-        } elseif ($arrIds && is_array($arrIds)) {
-            $filter->addFilterRule(new StaticIdList($arrIds));
+            $this->buildFilterRulesForUsedOnly($filter, $idList);
+        } elseif ($idList && is_array($idList)) {
+            $filter->addFilterRule(new StaticIdList($idList));
         }
 
         $objItems = $this->getTagMetaModel()->findByFilter($filter, $strSortingValue);

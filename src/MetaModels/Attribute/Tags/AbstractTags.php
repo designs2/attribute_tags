@@ -148,7 +148,7 @@ abstract class AbstractTags extends BaseComplex
     /**
      * {@inheritDoc}
      */
-    protected function prepareTemplate(Template $objTemplate, $arrRowData, $objSettings = null)
+    protected function prepareTemplate(Template $objTemplate, $arrRowData, $objSettings)
     {
         parent::prepareTemplate($objTemplate, $arrRowData, $objSettings);
         $objTemplate->alias = $this->getAliasColumn();
@@ -223,7 +223,7 @@ abstract class AbstractTags extends BaseComplex
     /**
      * {@inheritdoc}
      */
-    public function widgetToValue($varValue, $intId)
+    public function widgetToValue($varValue, $itemId)
     {
         // If we are in tree mode, we got a comma separate list.
         if ($this->isTreePicker() && !empty($varValue) && !is_array($varValue)) {
