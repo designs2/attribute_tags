@@ -41,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['fields']['tag_as_wizard'] = array
     'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard'],
     'exclude'   => true,
     'inputType' => 'select',
-    'options'   => array(0, 1, 2),
+    'options'   => array(0, 1, 2, 3),
     'reference' => &$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'],
     'eval'      => array
     (

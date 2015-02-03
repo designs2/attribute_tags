@@ -24,3 +24,4 @@ $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard'][1] =
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][0] = 'Display as checkbox menu';
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][1] = 'Display as checkbox wizard';
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][2] = 'Display as picker popup';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference'][3] = 'Display as tag list';
