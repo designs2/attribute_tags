@@ -197,9 +197,9 @@ abstract class AbstractTags extends BaseComplex
             $arrFieldDef['inputType'] = 'checkboxWizard';
         } elseif ($this->widgetMode == 2) {
             $arrFieldDef['inputType'] = 'checkbox';
-        }  elseif ($this->widgetMode == 3) {
+        } elseif ($this->widgetMode == 3) {
             $arrFieldDef['inputType']      = 'select';
-			$arrFieldDef['eval']['chosen'] = true;
+            $arrFieldDef['eval']['chosen'] = true;
         }
 
         try {
