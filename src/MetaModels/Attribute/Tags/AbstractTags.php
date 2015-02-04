@@ -195,11 +195,11 @@ abstract class AbstractTags extends BaseComplex
         } elseif ($this->widgetMode == 1) {
             // If tag as wizard is true, change the input type.
             $arrFieldDef['inputType'] = 'checkboxWizard';
-        } elseif ($this->widgetMode == 2) {
-            $arrFieldDef['inputType'] = 'checkbox';
         } elseif ($this->widgetMode == 3) {
             $arrFieldDef['inputType']      = 'select';
             $arrFieldDef['eval']['chosen'] = true;
+        } else {
+            $arrFieldDef['inputType'] = 'checkbox';
         }
 
         try {
