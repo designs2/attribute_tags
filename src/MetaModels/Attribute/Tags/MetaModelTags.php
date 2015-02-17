@@ -146,7 +146,7 @@ class MetaModelTags extends AbstractTags
                     ->prepare(
                         sprintf(
                             'SELECT v.id FROM %1$s AS v WHERE v.%2$s=?',
-                            $model,
+                            $model->getTableName(),
                             $alias
                         )
                     )
