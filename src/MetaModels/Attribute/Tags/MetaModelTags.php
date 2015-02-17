@@ -316,14 +316,12 @@ class MetaModelTags extends AbstractTags
 
         } else {
             $query = sprintf(
-            // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
                 'SELECT value_id AS value
                     FROM tl_metamodel_tag_relation
                     WHERE att_id = ?
                       AND item_id IN (%s)
                     GROUP BY value',
-                implode(',', array_fill(0, count($idList), '?')) // 1
-            // @codingStandardsIgnoreEnd
+                $this->parameterMask($idList)
             );
 
             $arrUsedValues = $this->getDatabase()
@@ -391,9 +389,7 @@ class MetaModelTags extends AbstractTags
                         WHERE tl_metamodel_tag_relation.item_id IN (%1$s)
                         AND att_id = ?
                         ORDER BY tl_metamodel_tag_relation.value_sorting',
-                        // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                        implode(',', array_fill(0, count($arrIds), '?')) // 1
-                        // @codingStandardsIgnoreEnd
+                        $this->parameterMask($arrIds)
                     )
                 )
                 ->execute(array_merge($arrIds, array($this->get('id'))));
