@@ -48,6 +48,45 @@ class FilterRuleTags extends FilterRule
     protected $value;
 
     /**
+     * The MetaModel we are referencing on.
+     *
+     * @var IMetaModel
+     */
+    protected $objSelectMetaModel;
+
+    /**
+     * Checking for the reference is a MetaModel.
+     *
+     * @param string $table
+     *
+     * @return bool
+     */
+    protected function isMetaModel($table) {
+        if ((substr($table, 0, 3) == 'mm_')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieve the linked MetaModel instance.
+     *
+     * @return IMetaModel
+     */
+    protected function getTagMetaModel()
+    {
+        if (empty($this->objSelectMetaModel)) {
+            $this->objSelectMetaModel = $this->objAttribute->getMetaModel()
+                                             ->getServiceContainer()
+                                             ->getFactory()
+                                             ->getMetaModel($this->objAttribute->get('tag_table'));
+        }
+
+        return $this->objSelectMetaModel;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function __construct(AbstractTags $objAttribute, $strValue)
@@ -73,22 +112,31 @@ class FilterRuleTags extends FilterRule
 
         $objDB = $this->objAttribute->getMetaModel()->getServiceContainer()->getDatabase();
 
-        if ($strColNameAlias) {
-            $objSelectIds = $objDB
-                ->prepare(
-                    sprintf(
-                        'SELECT %1$s FROM %2$s WHERE %3$s IN (%4$s)',
-                        $strColNameId,
-                        $strTableNameId,
-                        $strColNameAlias,
-                        implode(',', array_fill(0, count($arrValues), '?'))
+        if(!$this->isMetaModel($strTableNameId)) {
+            if ($strColNameAlias) {
+                $objSelectIds = $objDB
+                    ->prepare(
+                        sprintf(
+                            'SELECT %1$s FROM %2$s WHERE %3$s IN (%4$s)',
+                            $strColNameId,
+                            $strTableNameId,
+                            $strColNameAlias,
+                            implode(',', array_fill(0, count($arrValues), '?'))
+                        )
                     )
-                )
-                ->execute($arrValues);
+                    ->execute($arrValues);
 
-            $arrValues = $objSelectIds->fetchEach($strColNameId);
+                $arrValues = $objSelectIds->fetchEach($strColNameId);
+            } else {
+                $arrValues = array_map('intval', $arrValues);
+            }
         } else {
-            $arrValues = array_map('intval', $arrValues);
+            $values = array();
+            foreach($arrValues as $value) {
+                $values[] = array_values($this->getTagMetaModel()->getAttribute($strColNameAlias)->searchFor($value));
+            }
+
+            $arrValues = $this->flatten($values);
         }
 
         return $arrValues;
@@ -120,5 +168,21 @@ class FilterRuleTags extends FilterRule
             ->execute($this->objAttribute->get('id'));
 
         return $objMatches->fetchEach('id');
+    }
+
+    /**
+     * Flatten the value id array.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public function flatten(array $array)
+    {
+        $return = array();
+        array_walk_recursive($array, function ($a) use (&$return) {
+            $return[] = $a;
+        });
+        return $return;
     }
 }
