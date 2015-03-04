@@ -61,7 +61,8 @@ class FilterRuleTags extends FilterRule
      *
      * @return bool
      */
-    protected function isMetaModel($table) {
+    protected function isMetaModel($table)
+    {
         if ((substr($table, 0, 3) == 'mm_')) {
             return true;
         }
@@ -112,7 +113,7 @@ class FilterRuleTags extends FilterRule
 
         $objDB = $this->objAttribute->getMetaModel()->getServiceContainer()->getDatabase();
 
-        if(!$this->isMetaModel($strTableNameId)) {
+        if (!$this->isMetaModel($strTableNameId)) {
             if ($strColNameAlias) {
                 $objSelectIds = $objDB
                     ->prepare(
@@ -132,7 +133,7 @@ class FilterRuleTags extends FilterRule
             }
         } else {
             $values = array();
-            foreach($arrValues as $value) {
+            foreach ($arrValues as $value) {
                 $values[] = array_values($this->getTagMetaModel()->getAttribute($strColNameAlias)->searchFor($value));
             }
 
