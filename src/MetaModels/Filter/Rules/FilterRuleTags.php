@@ -58,7 +58,7 @@ class FilterRuleTags extends FilterRule
     /**
      * Checking for the reference is a MetaModel.
      *
-     * @param string $table The name of the table
+     * @param string $table The name of the table.
      *
      * @return bool
      */
@@ -175,7 +175,7 @@ class FilterRuleTags extends FilterRule
     /**
      * Flatten the value id array.
      *
-     * @param array $array The array which should be flattened
+     * @param array $array The array which should be flattened.
      *
      * @return array
      */
