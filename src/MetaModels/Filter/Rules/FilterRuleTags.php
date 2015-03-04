@@ -182,8 +182,8 @@ class FilterRuleTags extends FilterRule
     public function flatten(array $array)
     {
         $return = array();
-        array_walk_recursive($array, function ($a) use (&$return) {
-            $return[] = $a;
+        array_walk_recursive($array, function ($item) use (&$return) {
+            $return[] = $item;
         });
         return $return;
     }
