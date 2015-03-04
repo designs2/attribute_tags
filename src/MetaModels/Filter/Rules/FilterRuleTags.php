@@ -30,6 +30,7 @@ use MetaModels\Filter\FilterRule;
  *
  * @package AttributeTags
  * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author  Patrick Heller <ph@wacg.de>
  */
 class FilterRuleTags extends FilterRule
 {
