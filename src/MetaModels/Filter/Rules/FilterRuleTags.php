@@ -15,6 +15,7 @@
  * @author     David Maack <david.maack@arcor.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Martin Treml <github@r2pi.net>
+ * @author  Patrick Heller <ph@wacg.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
@@ -30,7 +31,6 @@ use MetaModels\Filter\FilterRule;
  *
  * @package AttributeTags
  * @author  Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author  Patrick Heller <ph@wacg.de>
  */
 class FilterRuleTags extends FilterRule
 {
