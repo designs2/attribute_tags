@@ -356,13 +356,14 @@ class MetaModelTags extends AbstractTags
     {
         $result = array();
         foreach ($items as $item) {
-            $parsed = $item->parseValue();
+            $parsedDisplay = $item->parseAttribute($displayValue);
+            $parsedAlias   = $item->parseAttribute($aliasColumn);
 
-            $textValue  = isset($parsed['text'][$displayValue])
-                ? $parsed['text'][$displayValue]
+            $textValue  = isset($parsedDisplay['text'])
+                ? $parsedDisplay['text']
                 : $item->get($displayValue);
-            $aliasValue = isset($parsed['text'][$aliasColumn])
-                ? $parsed['text'][$aliasColumn]
+            $aliasValue = isset($parsedAlias['text'])
+                ? $parsedAlias['text']
                 : $item->get($aliasColumn);
 
             $result[$aliasValue] = $textValue;
