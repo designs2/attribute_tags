@@ -78,7 +78,7 @@ class MetaModelTags extends AbstractTags
         $filter    = $metaModel->getEmptyFilter();
         $filter->addFilterRule(new StaticIdList($valueIds));
 
-        $items  = $metaModel->findByFilter($filter, 'id');
+        $items  = $metaModel->findByFilter($filter, 'id', $this->getSortingColumn());
         $values = array();
         foreach ($items as $item) {
             $valueId    = $item->get('id');
@@ -94,10 +94,36 @@ class MetaModelTags extends AbstractTags
     }
 
     /**
+     * Sort an id list by the option column.
+     *
+     * @param array $idList The id list to sort.
+     *
+     * @return array
+     */
+    private function sortIdsBySortingColumn($idList)
+    {
+        // Now sort the values according to our sorting column.
+        $filter = $this->getTagMetaModel()->getEmptyFilter();
+        // Add some more filter rules.
+        $filter->addFilterRule(new StaticIdList(array_keys($idList)));
+
+        $items = $this->getTagMetaModel()->findByFilter($filter, $this->getSortingColumn());
+
+        return array_keys(
+            $this->convertItemsToFilterOptions($items, $this->getValueColumn(), $this->getAliasColumn())
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function valueToWidget($varValue)
     {
+        // If we have a tree picker, the value must be a comma separated string.
+        if (empty($varValue)) {
+            return array();
+        }
+
         $aliasColumn = $this->getAliasColumn();
         $arrResult   = array();
 
@@ -108,9 +134,16 @@ class MetaModelTags extends AbstractTags
                     : $arrValue[self::TAGS_RAW][$aliasColumn];
 
                 if (!empty($aliasValue)) {
-                    $arrResult[] = $aliasValue;
+                    $arrResult[$arrValue[self::TAGS_RAW]['id']] = $aliasValue;
                 }
             }
+        }
+
+        // Sorting of values must be done.
+        $arrResult = $this->sortIdsBySortingColumn($arrResult);
+
+        if ($this->isTreePicker()) {
+            return implode(',', $arrResult);
         }
 
         return $arrResult;
@@ -145,9 +178,10 @@ class MetaModelTags extends AbstractTags
                 $result = $this->getDatabase()
                     ->prepare(
                         sprintf(
-                            'SELECT v.id FROM %1$s AS v WHERE v.%2$s=?',
+                            'SELECT v.id FROM %1$s AS v WHERE v.%2$s IN (%3$s) LIMIT 1',
                             $model->getTableName(),
-                            $alias
+                            $alias,
+                            $this->parameterMask($varValue)
                         )
                     )
                     ->execute($varValue);
@@ -408,7 +442,7 @@ class MetaModelTags extends AbstractTags
             $filter = $metaModel->getEmptyFilter();
             $filter->addFilterRule(new StaticIdList($referenceIds));
 
-            $items  = $metaModel->findByFilter($filter, 'id');
+            $items  = $metaModel->findByFilter($filter, 'id', $this->getSortingColumn());
             $values = array();
             foreach ($items as $item) {
                 $valueId    = $item->get('id');

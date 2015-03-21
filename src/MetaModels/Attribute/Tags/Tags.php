@@ -33,7 +33,6 @@ use Contao\Database\Result;
  */
 class Tags extends AbstractTags
 {
-
     /**
      * {@inheritdoc}
      */
@@ -47,6 +46,12 @@ class Tags extends AbstractTags
                 $arrResult[] = $arrValue[$strColNameAlias];
             }
         }
+
+        // If we have a tree picker, the value must be a comma separated string.
+        if ($this->isTreePicker() && !empty($arrResult)) {
+            $arrResult = implode(',', $arrResult);
+        }
+
         return $arrResult;
     }
 
@@ -68,10 +73,12 @@ class Tags extends AbstractTags
                 sprintf(
                     'SELECT %1$s.*
                     FROM %1$s
-                    WHERE %2$s IN (%3$s)',
+                    WHERE %2$s IN (%3$s)
+                    ORDER BY %4$s',
                     $this->getTagSource(),
                     $this->getAliasColumn(),
-                    implode(',', array_fill(0, count($arrParams), '?'))
+                    implode(',', array_fill(0, count($arrParams), '?')),
+                    $this->getSortingColumn()
                 )
             )
             ->execute($arrParams);
@@ -88,7 +95,6 @@ class Tags extends AbstractTags
 
         return $arrResult;
     }
-    // @codingStandardsIgnoreEnd
 
     /**
      * Retrieve the filter options for items with the given ids.
@@ -211,7 +217,7 @@ class Tags extends AbstractTags
         }
 
         if ($idList) {
-            $objValue = $this->retrieveFilterOptionsForIds($idList, $usedOnly, $arrCount);
+            $objValue = $this->retrieveFilterOptionsForIds($idList, $usedOnly);
         } else {
             $objValue = $this->retrieveFilterOptionsWithoutIds($usedOnly);
         }
