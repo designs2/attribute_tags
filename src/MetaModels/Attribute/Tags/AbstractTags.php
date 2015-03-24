@@ -429,13 +429,4 @@ abstract class AbstractTags extends BaseComplex
             )->execute($this->get('id'));
         }
     }
-
-    /**
-     * Convert the passed values to a list of value ids.
-     *
-     * @param string[] $values The values to convert.
-     *
-     * @return int[]
-     */
-    abstract public function convertValuesToValueIds($values);
 }

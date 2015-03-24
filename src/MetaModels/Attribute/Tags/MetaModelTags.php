@@ -468,36 +468,4 @@ class MetaModelTags extends AbstractTags
 
         return $result;
     }
-
-    /**
-     * Convert the passed values to a list of value ids.
-     *
-     * @param string[] $values The values to convert.
-     *
-     * @return int[]
-     */
-    public function convertValuesToValueIds($values)
-    {
-        $strColNameAlias = $this->getAliasColumn();
-
-        if ($strColNameAlias) {
-            /** @var MetaModelTags $attribute */
-            $metaModel       = $this->getTagMetaModel();
-            $sanitizedValues = array();
-            foreach ($values as $value) {
-                $valueIds = $metaModel->getAttribute($strColNameAlias)->searchFor($value);
-                if ($valueIds === null) {
-                    return null;
-                }
-
-                $sanitizedValues = array_merge($valueIds, $sanitizedValues);
-            }
-
-            return $sanitizedValues;
-        } else {
-            $values = array_map('intval', $values);
-        }
-
-        return $values;
-    }
 }

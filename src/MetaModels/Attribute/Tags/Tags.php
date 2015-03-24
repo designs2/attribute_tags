@@ -284,37 +284,4 @@ class Tags extends AbstractTags
         }
         return $arrReturn;
     }
-
-    /**
-     * Convert the passed values to a list of value ids.
-     *
-     * @param string[] $values The values to convert.
-     *
-     * @return int[]
-     */
-    public function convertValuesToValueIds($values)
-    {
-        $strTableNameId  = $this->getTagSource();
-        $strColNameId    = $this->getIdColumn();
-        $strColNameAlias = $this->getAliasColumn();
-
-        if ($strColNameAlias) {
-            $objSelectIds = $this
-                ->getDatabase()
-                ->prepare(sprintf(
-                    'SELECT %s FROM %s WHERE %s IN (%s)',
-                    $strColNameId,
-                    $strTableNameId,
-                    $strColNameAlias,
-                    implode(',', array_fill(0, count($values), '?'))
-                ))
-                ->execute($values);
-
-            $values = $objSelectIds->fetchEach($strColNameId);
-        } else {
-            $values = array_map('intval', $values);
-        }
-
-        return $values;
-    }
 }
