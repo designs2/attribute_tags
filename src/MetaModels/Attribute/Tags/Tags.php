@@ -52,7 +52,8 @@ class Tags extends AbstractTags
             $arrResult = implode(',', $arrResult);
         }
 
-        return $arrResult;
+        // We must use string keys.
+        return array_map('strval', $arrResult);
     }
 
     /**

@@ -146,7 +146,8 @@ class MetaModelTags extends AbstractTags
             return implode(',', $arrResult);
         }
 
-        return $arrResult;
+        // We must use string keys.
+        return array_map('strval', $arrResult);
     }
 
     /**
