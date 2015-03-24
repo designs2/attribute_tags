@@ -13,7 +13,7 @@ foreach ($this->raw as $arrTag):
     }
     $arrClass[] = ((($i++ % 2) == 0) ? 'even' : 'odd');
 
-    if ($this->alias && $arrTag[$this->alias] && !is_numeric($arrTag[$this->alias])) {
+    if ($this->alias && isset($arrTag[$this->alias]) && !is_numeric($arrTag[$this->alias])) {
         $arrClass[] = standardize($arrTag[$this->alias]);
     }
 ?>
