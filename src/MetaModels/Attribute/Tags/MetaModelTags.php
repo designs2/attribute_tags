@@ -283,6 +283,10 @@ class MetaModelTags extends AbstractTags
      */
     public function buildFilterRulesForFilterSetting($filter)
     {
+        if (!$this->get('tag_filter')) {
+            return;
+        }
+
         // Set Filter and co.
         $filterSettings = $this
             ->getMetaModel()
