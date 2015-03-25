@@ -78,7 +78,7 @@ class MetaModelTags extends AbstractTags
         $filter    = $metaModel->getEmptyFilter();
         $filter->addFilterRule(new StaticIdList($valueIds));
 
-        $items  = $metaModel->findByFilter($filter, 'id', $this->getSortingColumn());
+        $items  = $metaModel->findByFilter($filter, $this->getSortingColumn());
         $values = array();
         foreach ($items as $item) {
             $valueId    = $item->get('id');
@@ -447,7 +447,7 @@ class MetaModelTags extends AbstractTags
             $filter = $metaModel->getEmptyFilter();
             $filter->addFilterRule(new StaticIdList($referenceIds));
 
-            $items  = $metaModel->findByFilter($filter, 'id', $this->getSortingColumn());
+            $items  = $metaModel->findByFilter($filter, $this->getSortingColumn());
             $values = array();
             foreach ($items as $item) {
                 $valueId    = $item->get('id');
