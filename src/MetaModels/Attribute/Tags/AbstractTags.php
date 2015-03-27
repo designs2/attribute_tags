@@ -202,12 +202,6 @@ abstract class AbstractTags extends BaseComplex
             $arrFieldDef['inputType'] = 'checkbox';
         }
 
-        try {
-            $arrFieldDef['options'] = $this->getFilterOptions(null, false);
-        } catch (\Exception $exception) {
-            $arrFieldDef['options'] = 'Error: ' . $exception->getMessage();
-        }
-
         $arrFieldDef['eval']['includeBlankOption'] = true;
         $arrFieldDef['eval']['multiple']           = true;
 
