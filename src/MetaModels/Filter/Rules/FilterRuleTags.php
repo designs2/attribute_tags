@@ -133,9 +133,14 @@ class FilterRuleTags extends FilterRule
                 $arrValues = array_map('intval', $arrValues);
             }
         } else {
-            $values = array();
-            foreach ($arrValues as $value) {
-                $values[] = array_values($this->getTagMetaModel()->getAttribute($strColNameAlias)->searchFor($value));
+            // Fixme: Just a temporary hack. We should use the attribute for this.
+            if ($strColNameAlias == 'id'){
+                $values = $arrValues;
+            } else {
+                $values = array();
+                foreach ($arrValues as $value){
+                    $values[] = array_values($this->getTagMetaModel()->getAttribute($strColNameAlias)->searchFor($value));
+                }
             }
 
             $arrValues = $this->flatten($values);
