@@ -25,6 +25,7 @@ namespace MetaModels\Filter\Rules;
 
 use MetaModels\Attribute\Tags\AbstractTags;
 use MetaModels\Filter\FilterRule;
+use MetaModels\IMetaModel;
 
 /**
  * This is the MetaModelFilterRule class for handling select fields.
@@ -134,12 +135,14 @@ class FilterRuleTags extends FilterRule
             }
         } else {
             // Fixme: Just a temporary hack. We should use the attribute for this.
-            if ($strColNameAlias == 'id'){
+            if ($strColNameAlias == 'id') {
                 $values = $arrValues;
             } else {
                 $values = array();
-                foreach ($arrValues as $value){
-                    $values[] = array_values($this->getTagMetaModel()->getAttribute($strColNameAlias)->searchFor($value));
+                foreach ($arrValues as $value) {
+                    $values[] = array_values(
+                        $this->getTagMetaModel()->getAttribute($strColNameAlias)->searchFor($value)
+                    );
                 }
             }
 
