@@ -31,10 +31,6 @@ use MetaModels\IMetaModel;
 
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
- *
- * @package    AttributeTags
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @author     Christian de la Haye <service@delahaye.de>
  */
 class MetaModelTags extends AbstractTags
 {
@@ -74,11 +70,21 @@ class MetaModelTags extends AbstractTags
      */
     protected function getValuesById($valueIds)
     {
-        $metaModel = $this->getTagMetaModel();
-        $filter    = $metaModel->getEmptyFilter();
+        $recursionKey = $this->getMetaModel()->getTableName();
+        $metaModel    = $this->getTagMetaModel();
+        $filter       = $metaModel->getEmptyFilter();
         $filter->addFilterRule(new StaticIdList($valueIds));
 
-        $items  = $metaModel->findByFilter($filter, $this->getSortingColumn());
+        // Prevent recursion.
+        static $tables = array();
+        if (isset($tables[$recursionKey])) {
+            return array();
+        }
+        $tables[$recursionKey] = $recursionKey;
+
+        $items = $metaModel->findByFilter($filter, $this->getSortingColumn());
+        unset($tables[$recursionKey]);
+
         $values = array();
         foreach ($items as $item) {
             $valueId    = $item->get('id');
@@ -458,6 +464,8 @@ class MetaModelTags extends AbstractTags
                     $parsedItem['text']
                 );
             }
+
+            $values = $this->getValuesById($referenceIds);
 
             foreach ($valueIds as $itemId => $tagIds) {
                 foreach ($tagIds as $tagId) {
