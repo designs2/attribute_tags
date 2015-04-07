@@ -450,21 +450,6 @@ class MetaModelTags extends AbstractTags
                 $referenceIds[]        = $value;
             }
 
-            $filter = $metaModel->getEmptyFilter();
-            $filter->addFilterRule(new StaticIdList($referenceIds));
-
-            $items  = $metaModel->findByFilter($filter, $this->getSortingColumn());
-            $values = array();
-            foreach ($items as $item) {
-                $valueId    = $item->get('id');
-                $parsedItem = $item->parseValue();
-
-                $values[$valueId] = array_merge(
-                    array(self::TAGS_RAW  => $parsedItem['raw']),
-                    $parsedItem['text']
-                );
-            }
-
             $values = $this->getValuesById($referenceIds);
 
             foreach ($valueIds as $itemId => $tagIds) {
