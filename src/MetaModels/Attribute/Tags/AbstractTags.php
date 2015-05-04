@@ -108,7 +108,7 @@ abstract class AbstractTags extends BaseComplex
     {
         $strColNameAlias = $this->get('tag_alias');
         if ($this->isTreePicker() || !$strColNameAlias) {
-            $strColNameAlias = $this->get('tag_id');
+            $strColNameAlias = $this->getIdColumn();
         }
         return $strColNameAlias;
     }
