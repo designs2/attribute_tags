@@ -192,6 +192,7 @@ abstract class AbstractTags extends BaseComplex
             $arrFieldDef['eval']['sourceName'] = $this->getTagSource();
             $arrFieldDef['eval']['fieldType']  = 'checkbox';
             $arrFieldDef['eval']['idProperty'] = $this->getAliasColumn();
+            $arrFieldDef['eval']['orderField'] = $this->getSortingColumn();
         } elseif ($this->widgetMode == 1) {
             // If tag as wizard is true, change the input type.
             $arrFieldDef['inputType'] = 'checkboxWizard';
