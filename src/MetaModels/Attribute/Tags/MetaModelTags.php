@@ -23,6 +23,7 @@
 
 namespace MetaModels\Attribute\Tags;
 
+use MetaModels\Attribute\ITranslated;
 use MetaModels\Filter\Rules\StaticIdList;
 use MetaModels\Filter\IFilter;
 use MetaModels\IItem;
@@ -171,7 +172,14 @@ class MetaModelTags extends AbstractTags
         if ($attribute) {
             // It is an attribute, we may search for it.
             foreach ($varValue as $value) {
-                $ids = $attribute->searchFor($value);
+                if ($attribute instanceof ITranslated) {
+                    $ids = $attribute->searchForInLanguages(
+                        $value,
+                        array($model->getActiveLanguage(), $model->getFallbackLanguage())
+                    );
+                } else {
+                    $ids = $attribute->searchFor($value);
+                }
                 if ($ids) {
                     $valueIds = array_merge($valueIds, $ids);
                 }
