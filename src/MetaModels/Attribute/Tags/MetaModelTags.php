@@ -180,6 +180,11 @@ class MetaModelTags extends AbstractTags
                 } else {
                     $ids = $attribute->searchFor($value);
                 }
+                // If all match, return all.
+                if (null === $ids) {
+                    $valueIds = $model->getIdsFromFilter($model->getEmptyFilter(), $alias);
+                    break;
+                }
                 if ($ids) {
                     $valueIds = array_merge($valueIds, $ids);
                 }
