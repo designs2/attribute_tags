@@ -80,10 +80,12 @@ class FilterRuleTags extends FilterRule
     protected function getTagMetaModel()
     {
         if (empty($this->objSelectMetaModel)) {
-            $this->objSelectMetaModel = $this->objAttribute->getMetaModel()
-                                             ->getServiceContainer()
-                                             ->getFactory()
-                                             ->getMetaModel($this->objAttribute->get('tag_table'));
+            $this->objSelectMetaModel = $this
+                ->objAttribute
+                ->getMetaModel()
+                ->getServiceContainer()
+                ->getFactory()
+                ->getMetaModel($this->objAttribute->get('tag_table'));
         }
 
         return $this->objSelectMetaModel;
