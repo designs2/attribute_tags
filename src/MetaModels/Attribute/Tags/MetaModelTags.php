@@ -288,7 +288,7 @@ class MetaModelTags extends AbstractTags
             $this->calculateFilterOptionsCount($objItems, $arrCount);
         }
 
-        return $this->convertItemsToFilterOptions($objItems, $strDisplayValue, $this->getAliasColumn());
+        return $this->convertItemsToFilterOptions($objItems, $strDisplayValue, $this->getAliasColumn(), $arrCount);
     }
 
     /**
@@ -403,12 +403,16 @@ class MetaModelTags extends AbstractTags
      * Convert a collection of items into a proper filter option list.
      *
      * @param IItems|IItem[] $items        The item collection to convert.
+     *
      * @param string         $displayValue The name of the attribute to use as value.
+     *
      * @param string         $aliasColumn  The name of the attribute to use as alias.
+     *
+     * @param null|string[]  $count        The counter array.
      *
      * @return array
      */
-    protected function convertItemsToFilterOptions($items, $displayValue, $aliasColumn)
+    protected function convertItemsToFilterOptions($items, $displayValue, $aliasColumn, &$count = null)
     {
         $result = array();
         foreach ($items as $item) {
@@ -423,6 +427,13 @@ class MetaModelTags extends AbstractTags
                 : $item->get($aliasColumn);
 
             $result[$aliasValue] = $textValue;
+
+            if (null !== $count) {
+                if (isset($count[$item->get('id')])) {
+                    $count[$aliasValue] = $count[$item->get('id')];
+                    unset($count[$item->get('id')]);
+                }
+            }
         }
 
         return $result;
