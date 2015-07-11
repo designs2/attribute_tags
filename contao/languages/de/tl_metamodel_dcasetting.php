@@ -8,10 +8,10 @@
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  *
- * last-updated: 2013-10-26T04:11:23+02:00
+ * last-updated: 2015-07-11T04:11:41+02:00
  */
 
-
-$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']['0'] = 'Als Checkbox-Wizard anzeigen';
-$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']['1'] = 'Wählen Sie diese Option aus um die Anzeige von "Checkbox" auf "Checkbox-Wizard" umzustellen.';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']['0']           = 'Als Checkbox-Wizard anzeigen';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']['1']           = 'Wählen Sie diese Option aus um die Anzeige von "Checkbox" auf "Checkbox-Wizard" umzustellen.';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference']['1'] = 'Als Checkbox-Wizard anzeigen';
 

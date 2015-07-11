@@ -8,7 +8,7 @@
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  *
- * last-updated: 2013-07-10T12:10:45+02:00
+ * last-updated: 2015-07-11T04:11:41+02:00
  */
 
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['display_legend']      = 'Anzeigeeinstellungen';
@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']['0']      = 'Alias de
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']['1']      = 'Bitte wählen Sie einen Eintrag für den Alias der Mehrfachauswahl aus.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column']['0']     = 'Tabellenspalte für Bezeichnung/Name';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column']['1']     = 'Bitte wählen Sie eine Spalte.';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filter']['0']     = 'Filter';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']['0']         = 'ID der Mehrfachauswahl';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']['1']         = 'Bitte wählen Sie einen Eintrag für die ID der Mehrfachauswahl aus.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting']['0']    = 'Sortierung der Mehrfachauswahl';

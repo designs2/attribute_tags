@@ -8,7 +8,7 @@
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  *
- * last-updated: 2013-07-10T10:05:31+02:00
+ * last-updated: 2015-07-11T04:11:41+02:00
  */
 
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['display_legend']      = 'Paramètres d\'affichage';
@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']['0']      = 'Alias de
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']['1']      = 'Veuillez sélectionner une entrée pour l\'alias de l\'étiquette';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column']['0']     = 'Colonne de la table';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_column']['1']     = 'Veuillez sélectionner la colonne.';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_filter']['0']     = 'Filter';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']['0']         = ' ID Etiquette';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_id']['1']         = 'Veuillez sélectionner une entrée pour l\'ID de l\'étiquette';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_sorting']['0']    = 'Tri étiquette';
