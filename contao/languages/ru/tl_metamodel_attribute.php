@@ -8,10 +8,10 @@
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  *
- * last-updated: 2015-07-11T08:01:35+02:00
+ * last-updated: 2015-07-13T12:14:33+02:00
  */
 
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['display_legend']                 = 'Параметры отображения';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['display_legend']                 = 'Параметры вывода';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['sql_error']                      = 'SQL-запрос приводит к ошибке.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']['0']                 = 'Алиас тега';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_alias']['1']                 = 'Выберите значение для алиаса тега.';
