@@ -8,10 +8,13 @@
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  *
- * last-updated: 2015-07-11T04:11:41+02:00
+ * last-updated: 2015-07-11T08:01:35+02:00
  */
 
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']['0']           = 'Показать как мастер чекбоксов';
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard']['1']           = 'Выберите этот параметр для изменения типа представления с «чекбокс» на «мастер чекбоксов».';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference']['0'] = 'Показать чекбокс меню';
 $GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference']['1'] = 'Показать как мастер чекбоксов';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference']['2'] = 'Показать как всплывающее окно выбора';
+$GLOBALS['TL_LANG']['tl_metamodel_dcasetting']['tag_as_wizard_reference']['3'] = 'Показать как список тегов';
 
