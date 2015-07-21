@@ -44,5 +44,7 @@ CREATE TABLE `tl_metamodel_tag_relation` (
 --
 
 CREATE TABLE `tl_metamodel_dcasetting` (
-  `tag_as_wizard` varchar(1) NOT NULL default '0'
+  `tag_as_wizard` varchar(1) NOT NULL default '0',
+  `tag_minLevel` int(11) NOT NULL default '0',
+  `tag_maxLevel` int(11) NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
