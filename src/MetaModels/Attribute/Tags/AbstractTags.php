@@ -172,6 +172,8 @@ abstract class AbstractTags extends BaseComplex
                 'tag_filterparams',
                 'tag_sorting',
                 'tag_as_wizard',
+                'tag_minLevel',
+                'tag_maxLevel',
                 'mandatory',
                 'submitOnChange',
                 'filterable',
@@ -193,6 +195,8 @@ abstract class AbstractTags extends BaseComplex
             $arrFieldDef['eval']['fieldType']  = 'checkbox';
             $arrFieldDef['eval']['idProperty'] = $this->getAliasColumn();
             $arrFieldDef['eval']['orderField'] = $this->getSortingColumn();
+            $arrFieldDef['eval']['minLevel']   = $arrOverrides['tag_minLevel'];
+            $arrFieldDef['eval']['maxLevel']   = $arrOverrides['tag_maxLevel'];
         } elseif ($this->widgetMode == 1) {
             // If tag as wizard is true, change the input type.
             $arrFieldDef['inputType'] = 'checkboxWizard';
