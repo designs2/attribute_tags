@@ -217,7 +217,7 @@ class Tags extends AbstractTags
      */
     public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
-        if (!$this->isProperlyConfigured()) {
+        if (!$this->isFilterOptionRetrievingPossible($idList)) {
             return array();
         }
 

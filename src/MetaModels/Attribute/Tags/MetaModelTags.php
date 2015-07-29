@@ -273,7 +273,7 @@ class MetaModelTags extends AbstractTags
      */
     public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
-        if (!$this->isProperlyConfigured()) {
+        if (!$this->isFilterOptionRetrievingPossible($idList)) {
             return array();
         }
         $strDisplayValue = $this->getValueColumn();

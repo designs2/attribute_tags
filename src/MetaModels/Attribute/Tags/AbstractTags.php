@@ -181,6 +181,19 @@ abstract class AbstractTags extends BaseComplex
     }
 
     /**
+     * Test that we can create the filter options.
+     *
+     * @param string[]|null $idList The ids of items that the values shall be fetched from
+     *                              (If empty or null, all items).
+     *
+     * @return bool
+     */
+    protected function isFilterOptionRetrievingPossible($idList)
+    {
+        return $this->isProperlyConfigured() && (($idList === null) || !empty($idList));
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function prepareTemplate(Template $objTemplate, $arrRowData, $objSettings)
