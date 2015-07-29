@@ -34,6 +34,15 @@ use Contao\Database\Result;
 class Tags extends AbstractTags
 {
     /**
+     * {@inheritDoc}
+     */
+    protected function checkConfiguration()
+    {
+        return parent::checkConfiguration()
+            && $this->getDatabase()->tableExists($this->getTagSource());
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function valueToWidget($varValue)
@@ -208,12 +217,7 @@ class Tags extends AbstractTags
      */
     public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
-        if (!(
-            $this->getTagSource()
-            && $this->getDatabase()->tableExists($this->getTagSource())
-            && $this->getIdColumn()
-            && $this->getSortingColumn())
-        ) {
+        if (!$this->isFilterOptionRetrievingPossible($idList)) {
             return array();
         }
 
@@ -243,45 +247,46 @@ class Tags extends AbstractTags
      */
     public function getDataFor($arrIds)
     {
+        if (!$this->isProperlyConfigured()) {
+            return array();
+        }
+
         $strTableName = $this->getTagSource();
         $strColNameId = $this->getIdColumn();
         $objDB        = $this->getDatabase();
         $arrReturn    = array();
+        $itemIdColumn = $this->getMetaModel()->getTableName() . '_id';
 
-        if ($objDB->tableExists($strTableName) && $strTableName && $strColNameId) {
-            $metaModelTableName   = $this->getMetaModel()->getTableName();
-            $metaModelTableNameId = $metaModelTableName . '_id';
-
-            $objValue = $objDB
-                ->prepare(
-                    sprintf(
-                        'SELECT %1$s.*, tl_metamodel_tag_relation.item_id AS %2$s
-                        FROM %1$s
-                        LEFT JOIN tl_metamodel_tag_relation ON (
-                            (tl_metamodel_tag_relation.att_id=?)
-                            AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
-                        )
-                        WHERE tl_metamodel_tag_relation.item_id IN (%4$s)
-                        ORDER BY tl_metamodel_tag_relation.value_sorting',
-                        // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                        $strTableName,            // 1
-                        $metaModelTableNameId, // 2
-                        $strColNameId,            // 3
-                        implode(',', $arrIds)     // 4
-                    // @codingStandardsIgnoreEnd
+        $objValue = $objDB
+            ->prepare(
+                sprintf(
+                    'SELECT %1$s.*, tl_metamodel_tag_relation.item_id AS %2$s
+                    FROM %1$s
+                    LEFT JOIN tl_metamodel_tag_relation ON (
+                        (tl_metamodel_tag_relation.att_id=?)
+                        AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
                     )
+                    WHERE tl_metamodel_tag_relation.item_id IN (%4$s)
+                    ORDER BY tl_metamodel_tag_relation.value_sorting',
+                    // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+                    $strTableName,            // 1
+                    $itemIdColumn,            // 2
+                    $strColNameId,            // 3
+                    implode(',', $arrIds)     // 4
+                // @codingStandardsIgnoreEnd
                 )
-                ->execute($this->get('id'));
+            )
+            ->execute($this->get('id'));
 
-            while ($objValue->next()) {
-                if (!isset($arrReturn[$objValue->$metaModelTableNameId])) {
-                    $arrReturn[$objValue->$metaModelTableNameId] = array();
-                }
-                $arrData = $objValue->row();
-                unset($arrData[$metaModelTableNameId]);
-                $arrReturn[$objValue->$metaModelTableNameId][$objValue->$strColNameId] = $arrData;
+        while ($objValue->next()) {
+            if (!isset($arrReturn[$objValue->$itemIdColumn])) {
+                $arrReturn[$objValue->$itemIdColumn] = array();
             }
+            $arrData = $objValue->row();
+            unset($arrData[$itemIdColumn]);
+            $arrReturn[$objValue->$itemIdColumn][$objValue->$strColNameId] = $arrData;
         }
+
         return $arrReturn;
     }
 }

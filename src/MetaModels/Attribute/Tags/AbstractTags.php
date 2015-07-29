@@ -40,6 +40,13 @@ abstract class AbstractTags extends BaseComplex
     protected $widgetMode;
 
     /**
+     * Local cached flag if the attribute has been properly configured.
+     *
+     * @var bool
+     */
+    protected $isProperlyConfigured;
+
+    /**
      * Retrieve the database instance.
      *
      * @return \Database
@@ -143,6 +150,47 @@ abstract class AbstractTags extends BaseComplex
     protected function getReferenceTable()
     {
         return 'tl_metamodel_tag_relation';
+    }
+
+    /**
+     * Ensure the attribute has been configured correctly.
+     *
+     * @return bool
+     */
+    protected function isProperlyConfigured()
+    {
+        if (isset($this->isProperlyConfigured)) {
+            return $this->isProperlyConfigured;
+        }
+
+        return $this->isProperlyConfigured = $this->checkConfiguration();
+    }
+
+    /**
+     * Check the configuration of the attribute.
+     *
+     * @return bool
+     */
+    protected function checkConfiguration()
+    {
+        return $this->getTagSource()
+            && $this->getValueColumn()
+            && $this->getAliasColumn()
+            && $this->getIdColumn()
+            && $this->getSortingColumn();
+    }
+
+    /**
+     * Test that we can create the filter options.
+     *
+     * @param string[]|null $idList The ids of items that the values shall be fetched from
+     *                              (If empty or null, all items).
+     *
+     * @return bool
+     */
+    protected function isFilterOptionRetrievingPossible($idList)
+    {
+        return $this->isProperlyConfigured() && (($idList === null) || !empty($idList));
     }
 
     /**
@@ -358,7 +406,7 @@ abstract class AbstractTags extends BaseComplex
      */
     public function setDataFor($arrValues)
     {
-        if (!($this->getTagSource() && $this->getValueColumn())) {
+        if (!$this->isProperlyConfigured()) {
             return;
         }
 
@@ -408,24 +456,25 @@ abstract class AbstractTags extends BaseComplex
      */
     public function unsetDataFor($arrIds)
     {
-        if ($arrIds) {
-            if (!is_array($arrIds)) {
-                throw new \RuntimeException(
-                    'MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.',
-                    1
-                );
-            }
-            $objDB = \Database::getInstance();
-            $objDB->prepare(
-                sprintf(
-                    'DELETE FROM %s
-                    WHERE
-                    att_id=?
-                    AND item_id IN (%s)',
-                    $this->getReferenceTable(),
-                    implode(',', $arrIds)
-                )
-            )->execute($this->get('id'));
+        if (!is_array($arrIds)) {
+            throw new \RuntimeException(
+                'MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.',
+                1
+            );
         }
+        if (empty($arrIds)) {
+            return;
+        }
+
+        $this->getDatabase()->prepare(
+            sprintf(
+                'DELETE FROM %s
+                WHERE
+                att_id=?
+                AND item_id IN (%s)',
+                $this->getReferenceTable(),
+                implode(',', $arrIds)
+            )
+        )->execute($this->get('id'));
     }
 }
