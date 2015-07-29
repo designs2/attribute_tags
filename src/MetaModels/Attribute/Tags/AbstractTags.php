@@ -443,24 +443,25 @@ abstract class AbstractTags extends BaseComplex
      */
     public function unsetDataFor($arrIds)
     {
-        if ($arrIds) {
-            if (!is_array($arrIds)) {
-                throw new \RuntimeException(
-                    'MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.',
-                    1
-                );
-            }
-            $objDB = \Database::getInstance();
-            $objDB->prepare(
-                sprintf(
-                    'DELETE FROM %s
-                    WHERE
-                    att_id=?
-                    AND item_id IN (%s)',
-                    $this->getReferenceTable(),
-                    implode(',', $arrIds)
-                )
-            )->execute($this->get('id'));
+        if (!is_array($arrIds)) {
+            throw new \RuntimeException(
+                'MetaModelAttributeTags::unsetDataFor() invalid parameter given! Array of ids is needed.',
+                1
+            );
         }
+        if (empty($arrIds)) {
+            return;
+        }
+
+        $this->getDatabase()->prepare(
+            sprintf(
+                'DELETE FROM %s
+                WHERE
+                att_id=?
+                AND item_id IN (%s)',
+                $this->getReferenceTable(),
+                implode(',', $arrIds)
+            )
+        )->execute($this->get('id'));
     }
 }
