@@ -40,6 +40,13 @@ abstract class AbstractTags extends BaseComplex
     protected $widgetMode;
 
     /**
+     * Local cached flag if the attribute has been properly configured.
+     *
+     * @var bool
+     */
+    protected $isProperlyConfigured;
+
+    /**
      * Retrieve the database instance.
      *
      * @return \Database
@@ -143,6 +150,34 @@ abstract class AbstractTags extends BaseComplex
     protected function getReferenceTable()
     {
         return 'tl_metamodel_tag_relation';
+    }
+
+    /**
+     * Ensure the attribute has been configured correctly.
+     *
+     * @return bool
+     */
+    protected function isProperlyConfigured()
+    {
+        if (isset($this->isProperlyConfigured)) {
+            return $this->isProperlyConfigured;
+        }
+
+        return $this->isProperlyConfigured = $this->checkConfiguration();
+    }
+
+    /**
+     * Check the configuration of the attribute.
+     *
+     * @return bool
+     */
+    protected function checkConfiguration()
+    {
+        return $this->getTagSource()
+            && $this->getValueColumn()
+            && $this->getAliasColumn()
+            && $this->getIdColumn()
+            && $this->getSortingColumn();
     }
 
     /**
@@ -358,7 +393,7 @@ abstract class AbstractTags extends BaseComplex
      */
     public function setDataFor($arrValues)
     {
-        if (!($this->getTagSource() && $this->getValueColumn())) {
+        if (!$this->isProperlyConfigured()) {
             return;
         }
 

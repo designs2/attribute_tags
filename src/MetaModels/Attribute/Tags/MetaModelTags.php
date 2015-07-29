@@ -48,6 +48,15 @@ class MetaModelTags extends AbstractTags
     protected $objSelectMetaModel;
 
     /**
+     * {@inheritDoc}
+     */
+    protected function checkConfiguration()
+    {
+        return parent::checkConfiguration()
+            && (null !== $this->getTagMetaModel());
+    }
+
+    /**
      * Retrieve the linked MetaModel instance.
      *
      * @return IMetaModel
@@ -264,12 +273,11 @@ class MetaModelTags extends AbstractTags
      */
     public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
-        $strDisplayValue = $this->getValueColumn();
-        $strSortingValue = $this->getSortingColumn();
-
-        if (!($this->getTagMetaModel() && $strDisplayValue)) {
+        if (!$this->isProperlyConfigured()) {
             return array();
         }
+        $strDisplayValue = $this->getValueColumn();
+        $strSortingValue = $this->getSortingColumn();
 
         $filter = $this->getTagMetaModel()->getEmptyFilter();
 
@@ -444,42 +452,40 @@ class MetaModelTags extends AbstractTags
      */
     public function getDataFor($arrIds)
     {
-        $result       = array();
-        $displayValue = $this->getValueColumn();
-        $metaModel    = $this->getTagMetaModel();
+        if (!$this->isProperlyConfigured()) {
+            return array();
+        }
 
-        if ($this->getTagSource() && $metaModel && $displayValue) {
-            $rows = $this
-                ->getDatabase()
-                ->prepare(
-                    sprintf(
-                        'SELECT item_id AS id, value_id AS value
-                        FROM tl_metamodel_tag_relation
-                        WHERE tl_metamodel_tag_relation.item_id IN (%1$s)
-                        AND att_id = ?
-                        ORDER BY tl_metamodel_tag_relation.value_sorting',
-                        $this->parameterMask($arrIds)
-                    )
+        $rows = $this
+            ->getDatabase()
+            ->prepare(
+                sprintf(
+                    'SELECT item_id AS id, value_id AS value
+                    FROM tl_metamodel_tag_relation
+                    WHERE tl_metamodel_tag_relation.item_id IN (%1$s)
+                    AND att_id = ?
+                    ORDER BY tl_metamodel_tag_relation.value_sorting',
+                    $this->parameterMask($arrIds)
                 )
-                ->execute(array_merge($arrIds, array($this->get('id'))));
+            )
+            ->execute(array_merge($arrIds, array($this->get('id'))));
 
-            $valueIds     = array();
-            $referenceIds = array();
+        $valueIds     = array();
+        $referenceIds = array();
 
-            while ($rows->next()) {
-                /** @noinspection PhpUndefinedFieldInspection */
-                $value = $rows->value;
-                /** @noinspection PhpUndefinedFieldInspection */
-                $valueIds[$rows->id][] = $value;
-                $referenceIds[]        = $value;
-            }
+        while ($rows->next()) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            $value = $rows->value;
+            /** @noinspection PhpUndefinedFieldInspection */
+            $valueIds[$rows->id][] = $value;
+            $referenceIds[]        = $value;
+        }
 
-            $values = $this->getValuesById($referenceIds);
-
-            foreach ($valueIds as $itemId => $tagIds) {
-                foreach ($tagIds as $tagId) {
-                    $result[$itemId][$tagId] = $values[$tagId];
-                }
+        $values = $this->getValuesById($referenceIds);
+        $result = array();
+        foreach ($valueIds as $itemId => $tagIds) {
+            foreach ($tagIds as $tagId) {
+                $result[$itemId][$tagId] = $values[$tagId];
             }
         }
 
