@@ -382,6 +382,9 @@ abstract class AbstractTags extends BaseComplex
         $valuesToUpdate = array_diff($tagIds, $valuesToAdd);
         if ($valuesToUpdate) {
             foreach ($valuesToUpdate as $valueId) {
+	            if (!isset($tags[$valueId])) {
+	            	continue;
+	            }
                 if (!array_key_exists('tag_value_sorting', $tags[$valueId])) {
                     continue;
                 }
